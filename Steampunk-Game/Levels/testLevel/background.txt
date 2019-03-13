@@ -1,0 +1,1 @@
+testBackground.png 0.5 800 600
