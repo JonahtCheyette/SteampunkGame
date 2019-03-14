@@ -177,32 +177,28 @@ void Move::changeHooks(Object:: Player &a, std::vector<Object:: Point> b , int c
             int index = a.selectedHook;
             int x = b[a.selectedHook].x;
             int y = b[a.selectedHook].y;
-            int start = a.selectedHook;
             if(x < c.x || x > SCREEN_WIDTH + c.x || y > SCREEN_HEIGHT + c.y || y < c.y){
-                x = a.x;
-                y = a.y;
-            }
-            if(change == -1){
-                for(int i = 0; i < b.size(); i++){
-                    if(b[i].x > c.x && b[i].x < SCREEN_WIDTH + c.x && b[i].y < SCREEN_HEIGHT + c.y && b[i].y > c.y){
-                        if(b[i].x < x && abs(b[i].x - x) < difference){
-                            difference = abs(b[i].x - x);
-                            index = i;
+                if (change == -1) {
+                    for(int i = 0; i < b.size(); i++){
+                        if(b[i].x > c.x && b[i].x < SCREEN_WIDTH + c.x && b[i].y < SCREEN_HEIGHT + c.y && b[i].y > c.y){
+                            if(abs(b[i].x) < difference){
+                                difference = abs(b[i].x);
+                                index = i;
+                            }
+                        }
+                    }
+                } else {
+                    for(int i = 0; i < b.size(); i++){
+                        if(b[i].x > c.x && b[i].x < SCREEN_WIDTH + c.x && b[i].y < SCREEN_HEIGHT + c.y && b[i].y > c.y){
+                            if(abs(SCREEN_WIDTH - b[i].x) < difference){
+                                difference = abs(SCREEN_WIDTH - b[i].x);
+                                index = i;
+                            }
                         }
                     }
                 }
-            }else{
-                for(int i = 0; i < b.size(); i++){
-                    if(b[i].x > c.x && b[i].x < SCREEN_WIDTH + c.x && b[i].y < SCREEN_HEIGHT + c.y && b[i].y > c.y){
-                        if(b[i].x > x && abs(b[i].x - x) < difference){
-                            difference = abs(b[i].x - x);
-                            index = i;
-                        }
-                    }
-                }
-            }
-            if(index == start){
-                if(change == 1){
+            } else {
+                if(change == -1){
                     for(int i = 0; i < b.size(); i++){
                         if(b[i].x > c.x && b[i].x < SCREEN_WIDTH + c.x && b[i].y < SCREEN_HEIGHT + c.y && b[i].y > c.y){
                             if(b[i].x < x && abs(b[i].x - x) < difference){
@@ -211,7 +207,7 @@ void Move::changeHooks(Object:: Player &a, std::vector<Object:: Point> b , int c
                             }
                         }
                     }
-                }else{
+                } else {
                     for(int i = 0; i < b.size(); i++){
                         if(b[i].x > c.x && b[i].x < SCREEN_WIDTH + c.x && b[i].y < SCREEN_HEIGHT + c.y && b[i].y > c.y){
                             if(b[i].x > x && abs(b[i].x - x) < difference){

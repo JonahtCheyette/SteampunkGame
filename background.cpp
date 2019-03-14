@@ -18,10 +18,12 @@ void backGround::drawBackground(SDL_Renderer* renderer, Object::Camera c, int he
         while(destination.x < -1 * destination.w){
             destination.x += destination.w;
         }
-        int amount = ceil(SCREEN_WIDTH / destination.w) + 1;
-        for(int j = 0 ; j <= amount; j++){
-            SDL_RenderCopy(renderer, l[i].image, nullptr, &destination);
-            destination.x += destination.w;
+        if(destination.w < SCREEN_WIDTH){
+            int amount = ceil(SCREEN_WIDTH / destination.w) + 1;
+            for(int j = 0 ; j <= amount; j++){
+                SDL_RenderCopy(renderer, l[i].image, nullptr, &destination);
+                destination.x += destination.w;
+            }
         }
     }
 }
