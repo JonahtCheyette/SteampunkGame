@@ -9,11 +9,17 @@ int main(int argc, char * args[]) {
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// add in " | SDL_RENDERER_PRESENTVSYNC" after SDL_RENDERER_ACCELERATED for vsync
 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 	SDL_Event e;
+    
     std::vector<Object::tileHolder> tileVector;
     std::vector<Level> levels;
     
     loader.loadTiles(tileVector, "Steampunk-Game/tData", renderer);
     loader.loadLevels(levels, "Steampunk-Game/Levels", renderer);
+    
+    bool dMode = false;
+    int initX = 0;
+    int initY = 0;
+    
     
 	Object::Camera camera;
     
@@ -34,8 +40,10 @@ int main(int argc, char * args[]) {
 		SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
 
 		event.update(e);
+        
 		menu.mainMenuButtons(event.mouseX, event.mouseY, event.mouse1, event.quit, event.inGame);
 		menu.drawMainMenu(renderer);
+        event.clear(e);
 		while (event.inGame) {//game loop
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 			SDL_RenderClear(renderer);
@@ -53,23 +61,51 @@ int main(int argc, char * args[]) {
 
 				SDL_RenderPresent(renderer);
 			}
+            if(!dMode){
+                move.movePlayer(player, e, levels[whichLevel], camera, tiles.loadedLevel);
+                move.moveHook(player);
             
-            move.movePlayer(player, e, levels[whichLevel], camera, tiles.loadedLevel);
-            move.moveHook(player);
-            
-            tiles.checkCollision(tiles.loadedLevel, player, tileVector);
+                tiles.checkCollision(tiles.loadedLevel, player, tileVector);
 
-			move.moveCamera(camera, player, levels[whichLevel]);
+                move.moveCamera(camera, player, levels[whichLevel]);
+            } else {
+                if(event.keyboard_state_array[SDL_SCANCODE_W]) camera.y -= 5;
+                if(event.keyboard_state_array[SDL_SCANCODE_S]) camera.y += 5;
+                if(event.keyboard_state_array[SDL_SCANCODE_A]) camera.x -= 5;
+                if(event.keyboard_state_array[SDL_SCANCODE_D]) camera.x += 5;
+                if(camera.x < 0) camera.x = 0;
+                if(camera.y < 0) camera.y = 0;
+                SDL_Rect heldRect;
+                if(event.mouse1){
+                    heldRect.x = event.mouseX + camera.x;
+                    heldRect.y = event.mouseY + camera.y;
+                    initX = heldRect.x;
+                    initY = heldRect.y;
+                    heldRect.w = 0;
+                    heldRect.h = 0;
+                }
+                if(event.mouse1held && heldRect.x != 0 && heldRect.y != 0){
+                    heldRect.x = initX - camera.x;
+                    heldRect.y = initY - camera.y;
+                    heldRect.w = event.mouseX - heldRect.x;
+                    heldRect.h = event.mouseY - heldRect.y;
+                    SDL_RenderDrawRect(renderer, &heldRect);
+                }
+                if (event.mouse1Released && heldRect.x != 0 && heldRect.y != 0) {
+                    
+                }
+            }
             
             levels[whichLevel].background.drawBackground(renderer, camera, levels[whichLevel].height);
             
             tiles.drawTiles(tiles.loadedLevel, camera, renderer, tileVector);
             
             object.drawHooks(levels[whichLevel].hookList, camera, player.selectedHook, renderer);
-			object.drawPlayer(player, camera, renderer);
-
-			//SDL_RenderDrawLine(renderer, 0 - camera.x, 100 - camera.y, 3000 - camera.x, 400 - camera.y);
             
+            if(!dMode){
+                object.drawPlayer(player, camera, renderer);
+            }
+
             if(player.hookState == 2) SDL_RenderDrawLine(renderer, player.x - camera.x, player.y - camera.y, player.target.x - camera.x, player.target.y - camera.y);
             if(player.hookState == 1 || player.hookState == 3) SDL_RenderDrawLine(renderer, player.x - camera.x, player.y - camera.y, player.grappleHead.x - camera.x, player.grappleHead.y - camera.y);
 			SDL_RenderPresent(renderer);

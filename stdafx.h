@@ -9,6 +9,11 @@
     #include <SDL_image.h>
     #include <SDL_ttf.h>
 #endif
+#ifdef _WIN64
+#include <SDL.h>
+#include <SDL_image.h>
+#include <SDL_ttf.h>
+#endif
 #undef main
 
 #include <dirent.h>

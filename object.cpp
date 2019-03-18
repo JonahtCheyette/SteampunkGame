@@ -59,6 +59,14 @@ Object::AABB::AABB() {
 	height = 0;
 }
 
+Object::Tile::Tile(int x, int y, int f){
+    this -> x = x;
+    this -> y = y;
+    this -> w = TILE_WIDTH;
+    this -> h = TILE_HEIGHT;
+    this -> f = f;
+}
+
 Object::Player::Player() {
 	x = 500;
 	y = 0;
@@ -84,6 +92,7 @@ Object::Player::Player() {
     grappling = false;
     hookState = 0;
     changedHook = false;
+    crouching = false;
 }
 
 Object::tileHolder::tileHolder(int kind, float tileNum, float friction, std::string path, SDL_Renderer* renderer){
@@ -129,7 +138,12 @@ void Object::drawPlayer(Player a, Camera b, SDL_Renderer* renderer) {
 	destination.y = a.y - a.hitbox.height / 2 - b.y;
 	destination.w = a.hitbox.width;
 	destination.h = a.hitbox.height;
-
+/*
+    if(a.crouching){
+        destination.h /= 2;
+        destination.y += destination.h;
+    }
+    */
 	SDL_RenderCopy(renderer, player, nullptr, &destination);
 }
 

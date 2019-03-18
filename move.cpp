@@ -5,11 +5,11 @@ void Move::moveCamera(Object::Camera &a, Object::Player b, Level l) {
 	a.y = (b.y + b.hitbox.height / 2) - SCREEN_HEIGHT / 2;
 	if (a.x < 0) a.x = 0;
 	if (a.x + SCREEN_WIDTH > l.width) a.x = l.width - SCREEN_WIDTH;
-    if(a.y < 0) a.y = 0;
+    if(a.y + l.overlap < 0) a.y = -l.overlap;
 	if (a.y + SCREEN_HEIGHT > l.height) a.y = l.height - SCREEN_HEIGHT;
 }
 
-void Move::movePlayer(Object::Player &a, SDL_Event& e, Level l, Object::Camera c, std::vector<std::vector<float>> tileGrid) {
+void Move::movePlayer(Object::Player &a, SDL_Event& e, Level l, Object::Camera c, std::vector<Object::Tile> tileGrid) {
     
     a.accelY += Gravity;
     
@@ -52,14 +52,14 @@ void Move::movePlayer(Object::Player &a, SDL_Event& e, Level l, Object::Camera c
     if (a.velY < -a.maxYSpeed) a.velY = -a.maxYSpeed;
     
 	a.x += a.velX;
-	a.y += a.velY;
-
+    a.y += a.velY;
+    
 	a.hitbox.x = a.x;
 	a.hitbox.y = a.y;
     
 	if (a.hitbox.y + (a.hitbox.height / 2) > l.height) {
         a.friction = 0.2;
-		a.y = l.height - (a.hitbox.height / 2);
+		a.y = (l.height) - (a.hitbox.height / 2);
 		a.velY = 0;
 		a.airborne = false;
 	} else {
@@ -73,8 +73,8 @@ void Move::movePlayer(Object::Player &a, SDL_Event& e, Level l, Object::Camera c
 		a.x = l.width - a.hitbox.width / 2;
 		a.velX = 0;
 	}
-    if(a.y - a.hitbox.height / 2 < 0){
-        a.y = a.hitbox.height / 2;
+    if(a.y - a.hitbox.height / 2 < -1 * l.overlap){
+        a.y = a.hitbox.height / 2 - l.overlap;
         a.velY = 0;
     }
     
@@ -147,7 +147,7 @@ void Move:: applyForce(Object::Player &a,float forceX, float forceY){
     a.accelX += forceX/a.mass;
 }
 
-void Move::grapple(Object:: Player &a, Object:: Point b, std::vector<std::vector<float>> tileGrid, Object:: Camera c){
+void Move::grapple(Object:: Player &a, Object:: Point b, std::vector<Object::Tile> tileGrid, Object:: Camera c){
     if(a.hookState != 1 && a.hookState != 2){
         if(b.x > c.x && b.x < SCREEN_WIDTH + c.x && b.y < SCREEN_HEIGHT + c.y && b.y > c.y){
             a.grappleHead.x = a.x;
@@ -176,8 +176,7 @@ void Move::changeHooks(Object:: Player &a, std::vector<Object:: Point> b , int c
             int difference = SCREEN_WIDTH;
             int index = a.selectedHook;
             int x = b[a.selectedHook].x;
-            int y = b[a.selectedHook].y;
-            if(x < c.x || x > SCREEN_WIDTH + c.x || y > SCREEN_HEIGHT + c.y || y < c.y){
+            if(x < c.x || x > SCREEN_WIDTH + c.x){
                 if (change == -1) {
                     for(int i = 0; i < b.size(); i++){
                         if(b[i].x > c.x && b[i].x < SCREEN_WIDTH + c.x && b[i].y < SCREEN_HEIGHT + c.y && b[i].y > c.y){

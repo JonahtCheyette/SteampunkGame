@@ -62,12 +62,21 @@ class Object {
             bool grappling;
             int hookState;
             bool changedHook;
+            bool crouching;
             
             Object::Point target;
             Object::Point grappleHead;
 
 			Player();
 		};
+    
+        struct Tile {
+            int x, y;
+            int w, h;
+            int f;
+            SDL_Texture* texture;
+            Tile (int x, int y, int f);
+        };
     
         struct tileHolder {
             int kind;

@@ -7,6 +7,7 @@ public:
     
     int height;
     int width;
+    int overlap;
     std::string path;
     std::vector< std::vector <float> > tileGrid;
     std::vector<Object::Point> hookList;

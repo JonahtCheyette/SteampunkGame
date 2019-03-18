@@ -4,6 +4,8 @@ void Event::update(SDL_Event &e) {
 	SDL_GetMouseState(&mouseX, &mouseY);
 	mouse1 = false;
 	mouse2 = false;
+    mouse1Released = false;
+    mouse2Released = false;
 	while (SDL_PollEvent(&e) != 0) {
 		//quiting the program
 		switch (e.type) {
@@ -29,12 +31,25 @@ void Event::update(SDL_Event &e) {
 			switch (e.button.button) {
 			case SDL_BUTTON_LEFT:
 				mouse1held = false;
+                mouse1Released = true;
 				break;
 			case SDL_BUTTON_RIGHT:
 				mouse2held = false;
+                mouse2Released = true;
 				break;
 			}
 			break;
 		}
 	}
+}
+
+void Event::clear(SDL_Event &e){
+    mouse1 = false;
+    mouse2 = false;
+    mouse1Released = false;
+    mouse2Released = false;
+    mouse1held = false;
+    mouse2held = false;
+    mouseX = 0;
+    mouseY = 0;
 }

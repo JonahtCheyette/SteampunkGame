@@ -4,21 +4,19 @@
 class Tiles {
 public:
     void mapInit(Level level, std::vector<Object::tileHolder> t);
-	void drawTiles(std::vector<std::vector<float>> tileGrid, Object::Camera camera, SDL_Renderer* renderer, std::vector<Object::tileHolder> t);
-
-    void sortTiles(std::vector<std::vector<float>> &tileGrid, float tileNum);
-    void showCorrectTiles(float n, SDL_Rect destination, SDL_Renderer* renderer, std::vector<Object::tileHolder> t);
+    void drawTiles(std::vector<Object::Tile> tileGrid, Object::Camera camera, SDL_Renderer* renderer, std::vector<Object::tileHolder> t);
     
-    void checkCollision(std::vector<std::vector<float>> tileGrid, Object::Player &a, std::vector<Object::tileHolder> t);
-    Object::Point checkLineCollision(std::vector<std::vector<float>> tileGrid, Object::Point a, Object:: Point b);
+    void checkCollision(std::vector<Object::Tile> tileGrid, Object::Player &a, std::vector<Object::tileHolder> t);
+    Object::Point checkLineCollision(std::vector<Object::Tile> tileGrid, Object::Point a, Object:: Point b);
     
-    int interceptsX[9];
-    int interceptsY[9];
+    int intercepts[9];
     float overallOverlap[9];
     
-    std::vector<std::vector<float>> loadedLevel;
-    float xPushed;
-    float yPushed;
+    std::vector<Object::Tile> loadedLevel;
+    float colOverlap;
+    float xOverlap;
+    float yOverlap;
+    int correctIndex;
 
 	SDL_Texture* topLeft;
 	SDL_Texture* top;
