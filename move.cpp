@@ -3,10 +3,10 @@
 void Move::moveCamera(Object::Camera &a, Object::Player b, Level l) {
 	a.x = (b.x + b.hitbox.width / 2) - SCREEN_WIDTH / 2;
 	a.y = (b.y + b.hitbox.height / 2) - SCREEN_HEIGHT / 2;
+    if(a.x + SCREEN_WIDTH > l.width) a.x = l.width - SCREEN_WIDTH;
 	if (a.x < 0) a.x = 0;
-	if (a.x + SCREEN_WIDTH > l.width) a.x = l.width - SCREEN_WIDTH;
-    if(a.y + l.overlap < 0) a.y = -l.overlap;
-	if (a.y + SCREEN_HEIGHT > l.height) a.y = l.height - SCREEN_HEIGHT;
+    if(a.y < 0) a.y = 0;
+    if(a.y + SCREEN_HEIGHT > l.height) a.y = l.height -SCREEN_HEIGHT;
 }
 
 void Move::movePlayer(Object::Player &a, SDL_Event& e, Level l, Object::Camera c, std::vector<Object::Tile> tileGrid) {
@@ -39,7 +39,7 @@ void Move::movePlayer(Object::Player &a, SDL_Event& e, Level l, Object::Camera c
     
     //friction
     if((!event.keyboard_state_array[SDL_SCANCODE_D] && a.velX > 0) || (!event.keyboard_state_array[SDL_SCANCODE_A] && a.velX < 0)){
-        move.applyForce(a,a.velX * (-1 * a.friction * a.mass * Gravity), a.velY * (-1 * a.friction * a.mass * Gravity));
+        move.applyForce(a, a.velX * (-1 * a.friction * a.mass * Gravity), 0);
     }
     
 	a.velX += a.accelX;
@@ -56,28 +56,19 @@ void Move::movePlayer(Object::Player &a, SDL_Event& e, Level l, Object::Camera c
     
 	a.hitbox.x = a.x;
 	a.hitbox.y = a.y;
-    
-	if (a.hitbox.y + (a.hitbox.height / 2) > l.height) {
-        a.friction = 0.2;
-		a.y = (l.height) - (a.hitbox.height / 2);
-		a.velY = 0;
-		a.airborne = false;
-	} else {
-        a.friction = 0;
-		a.airborne = true;
-	}
+    a.friction = 0;
+    a.airborne = true;
+    if(a.hitbox.x + a.hitbox.width / 2 > l.width){
+        a.x = l.width - (a.hitbox.width/2);
+    }
 	if (a.hitbox.x - a.hitbox.width / 2 < 0) {
 		a.x = a.hitbox.width / 2;
 		a.velX = 0;
-	} else if (a.hitbox.x + a.hitbox.width / 2 >= l.width) {
-		a.x = l.width - a.hitbox.width / 2;
-		a.velX = 0;
 	}
-    if(a.y - a.hitbox.height / 2 < -1 * l.overlap){
-        a.y = a.hitbox.height / 2 - l.overlap;
+    if(a.y - a.hitbox.height / 2 < 0){
+        a.y = a.hitbox.height / 2;
         a.velY = 0;
     }
-    
     //making it so that the hook doesn't change every frame you hold down an arrow
     if(a.changedHook && !(event.keyboard_state_array[SDL_SCANCODE_LEFT] || event.keyboard_state_array[SDL_SCANCODE_RIGHT])){
         a.changedHook = false;

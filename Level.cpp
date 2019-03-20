@@ -3,7 +3,6 @@
 Level Level::levelInit(std::string path, SDL_Renderer* renderer){
     Level level;
     level.path = path;
-    level.overlap = 0;
     std::string line;
     int a, b;
     std::string type;
@@ -23,14 +22,11 @@ Level Level::levelInit(std::string path, SDL_Renderer* renderer){
     while(hookFile >> a >> b){
         level.hookList.push_back(Object::Point(a, b, "hook"));
     }
-    level.background.backgroundInit(path + "background.txt", renderer);
     level.height = (int) level.tileGrid.size() * TILE_HEIGHT;
     level.width = (int) level.tileGrid[0].size() * TILE_WIDTH;
     if(level.width < SCREEN_WIDTH){
         level.width = SCREEN_WIDTH;
     }
-    if(level.height < SCREEN_HEIGHT){
-        level.overlap = SCREEN_HEIGHT - level.height;
-    }
+    level.background.backgroundInit(path + "background.txt", renderer);
     return level;
 }

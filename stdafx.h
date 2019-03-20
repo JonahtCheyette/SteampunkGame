@@ -10,9 +10,9 @@
     #include <SDL_ttf.h>
 #endif
 #ifdef _WIN64
-#include <SDL.h>
-#include <SDL_image.h>
-#include <SDL_ttf.h>
+    #include <SDL.h>
+    #include <SDL_image.h>
+    #include <SDL_ttf.h>
 #endif
 #undef main
 
@@ -40,6 +40,8 @@ static Draw draw;
 static Tiles tiles;
 #include "loader.h"
 static Loader loader;
+#include "developerMode.h"
+static developerMode developer;
 
 constexpr auto SCREEN_WIDTH = (1920 / 3) * 2; // accounting for scaling on personal device
 constexpr auto SCREEN_HEIGHT = (1080 / 3) * 2;

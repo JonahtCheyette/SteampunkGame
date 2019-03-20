@@ -8,22 +8,25 @@ void backGround::backgroundInit(std::string path, SDL_Renderer* renderer){
     }
 }
 
-void backGround::drawBackground(SDL_Renderer* renderer, Object::Camera c, int height){
+void backGround::drawBackground(SDL_Renderer* renderer, Object::Camera c){
     for(int i = 0; i < l.size(); i++){
+        int amount = 0;
         SDL_Rect destination;
         destination.w = l[i].w;
         destination.h = l[i].h;
-        destination.x = -1 * l[i].scrollrate * c.x;
-        destination.y = (-1 * l[i].scrollrate * c.y) + (height - SCREEN_HEIGHT);
+        destination.x = (l[i].scrollrate * c.x) - c.x;
+        destination.y = (l[i].scrollrate * c.y) - c.y;
         while(destination.x < -1 * destination.w){
             destination.x += destination.w;
         }
         if(destination.w < SCREEN_WIDTH){
-            int amount = ceil(SCREEN_WIDTH / destination.w) + 1;
-            for(int j = 0 ; j <= amount; j++){
-                SDL_RenderCopy(renderer, l[i].image, nullptr, &destination);
-                destination.x += destination.w;
-            }
+            amount = ceil(SCREEN_WIDTH / destination.w) + 1;
+        } else {
+            amount = 2;
+        }
+        for(int j = 0 ; j <= amount; j++){
+            SDL_RenderCopy(renderer, l[i].image, nullptr, &destination);
+            destination.x += destination.w;
         }
     }
 }

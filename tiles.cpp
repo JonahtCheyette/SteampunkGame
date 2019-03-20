@@ -4,7 +4,7 @@ void Tiles::mapInit(Level level, std::vector<Object::tileHolder> t) {
     for(int i = 0; i < t.size(); i++){
         if(t[i].tileNum > 0){
             for (int y = 0; y < level.tileGrid.size(); y++){
-                for(int x = 0; x < level.tileGrid[0].size(); x++){
+                for(int x = 0; x < level.tileGrid[y].size(); x++){
                     if(level.tileGrid[y][x] == t[i].tileNum){
                         Object::Tile tile(x * TILE_WIDTH, y * TILE_HEIGHT, t[i].friction);
                         above = false;
@@ -231,74 +231,73 @@ Object::Point Tiles::checkLineCollision(std::vector<Object::Tile> tileGrid, Obje
         rEdge = lEdge + tileGrid[i].w;
         tEdge = tileGrid[i].y;
         bEdge = tEdge + tileGrid[i].h;
-            std::cout<<tileGrid.size()<<std::endl;
-            if(a.x < b.x){
-                if(rEdge < a.x){
-                    continue;
-                }
-                if(lEdge > b.x){
-                    continue;
-                }
-            } else {
-                if(rEdge < b.x){
-                    continue;
-                }
-                if(lEdge > a.x){
-                    continue;
-                }
+        if(a.x < b.x){
+            if(rEdge < a.x){
+                continue;
             }
-            if(a.y < b.y){
-                if(tEdge < a.y){
-                    continue;
-                }
-                if(bEdge > b.y){
-                    continue;
-                }
-            } else {
-                if(tEdge < b.y){
-                    continue;
-                }
-                if(bEdge > a.y){
-                    continue;
-                }
+            if(lEdge > b.x){
+                continue;
             }
-            lEdgeLine = (lEdge * m) + intercept;
-            rEdgeLine = (rEdge * m) + intercept;
-            tEdgeLine = (tEdge - intercept) / m;
-            bEdgeLine = (bEdge - intercept) / m;
-            if(lEdgeLine <= bEdge && lEdgeLine >= tEdge){
-                lineCollided = true;
-                if(distance > sqrt(pow(a.x - lEdge,2) + pow(a.y - lEdgeLine, 2))){
-                    lineCollision.y = lEdgeLine;
-                    lineCollision.x = lEdge;
-                    distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y, 2));
-                }
+        } else {
+            if(rEdge < b.x){
+                continue;
             }
-            if(rEdgeLine <= bEdge && rEdgeLine >= tEdge){
-                lineCollided = true;
-                if(distance > sqrt(pow(a.x - rEdge,2) + pow(a.y - rEdgeLine, 2))){
-                    lineCollision.y = rEdgeLine;
-                    lineCollision.x = rEdge;
-                    distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y, 2));
-                }
-            }
-            if(tEdgeLine <= rEdge && tEdgeLine >= lEdge){
-                lineCollided = true;
-                if(distance > sqrt(pow(a.y - tEdge,2) + pow(a.x - tEdgeLine, 2))){
-                    lineCollision.y = tEdge;
-                    lineCollision.x = tEdgeLine;
-                    distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y, 2));
-                }
-            }
-            if(bEdgeLine <= rEdge && bEdgeLine >= lEdge){
-                lineCollided = true;
-                if(distance > sqrt(pow(a.y - bEdge,2) + pow(a.x - bEdgeLine, 2))){
-                    lineCollision.y = bEdge;
-                    lineCollision.x = bEdgeLine;
-                    distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y,2));
-                }
+            if(lEdge > a.x){
+                continue;
             }
         }
+        if(a.y < b.y){
+            if(tEdge < a.y){
+                continue;
+            }
+            if(bEdge > b.y){
+                continue;
+            }
+        } else {
+            if(tEdge < b.y){
+                continue;
+            }
+            if(bEdge > a.y){
+                continue;
+            }
+        }
+        lEdgeLine = (lEdge * m) + intercept;
+        rEdgeLine = (rEdge * m) + intercept;
+        tEdgeLine = (tEdge - intercept) / m;
+        bEdgeLine = (bEdge - intercept) / m;
+        if(lEdgeLine <= bEdge && lEdgeLine >= tEdge){
+            lineCollided = true;
+            if(distance > sqrt(pow(a.x - lEdge,2) + pow(a.y - lEdgeLine, 2))){
+                lineCollision.y = lEdgeLine;
+                lineCollision.x = lEdge;
+                distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y, 2));
+            }
+        }
+        if(rEdgeLine <= bEdge && rEdgeLine >= tEdge){
+            lineCollided = true;
+            if(distance > sqrt(pow(a.x - rEdge,2) + pow(a.y - rEdgeLine, 2))){
+                lineCollision.y = rEdgeLine;
+                lineCollision.x = rEdge;
+                distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y, 2));
+            }
+        }
+        if(tEdgeLine <= rEdge && tEdgeLine >= lEdge){
+            lineCollided = true;
+            if(distance > sqrt(pow(a.y - tEdge,2) + pow(a.x - tEdgeLine, 2))){
+                lineCollision.y = tEdge;
+                lineCollision.x = tEdgeLine;
+                distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y, 2));
+            }
+        }
+        if(bEdgeLine <= rEdge && bEdgeLine >= lEdge){
+            lineCollided = true;
+            if(distance > sqrt(pow(a.y - bEdge,2) + pow(a.x - bEdgeLine, 2))){
+                lineCollision.y = bEdge;
+                lineCollision.x = bEdgeLine;
+                distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y,2));
+            }
+        }
+    }
     if(lineCollided){
         return lineCollision;
     }
