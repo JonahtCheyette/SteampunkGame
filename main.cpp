@@ -71,7 +71,8 @@ int main(int argc, char * args[]) {
 
                 move.moveCamera(camera, player, levels[whichLevel]);
             } else {
-                //developerMode::moveCamera(camera);
+                developer.moveCamera(camera);
+                //developer.addTiles(tileVector, camera, renderer, initX, initY, clickstate, held, levels[whichLevel], event.mouse1, event.mouse1held, event.mouse1Released, event.mouseX, event.mouseY);
                 SDL_Rect heldRect;
                 if(event.mouse1 && clickstate == 0){
                     heldRect.x = event.mouseX + camera.x;
@@ -146,7 +147,8 @@ int main(int argc, char * args[]) {
                     }
                     mapFile.close();
                     if(fy >= grid.size()){
-                        for(int i = 0; i <= fy - grid.size() + 1; i++){
+                        std::vector<float> row;
+                        for(int i = 0; i <= fy - grid.size() + 2; i++){
                             std::vector<float> row;
                             for(int j = 0; j < grid[0].size(); j++){
                                 row.push_back(0);

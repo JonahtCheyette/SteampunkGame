@@ -10,29 +10,29 @@ void developerMode::moveCamera(Object::Camera &c){
     if(c.y < 0) c.y = 0;
 }
 
-void developerMode::addTiles(std::vector<Object::tileHolder> tileVector, Object::Camera camera, SDL_Renderer* renderer, int &initX, int & initY, int &clickstate, bool &held, Level level){
+void developerMode::addTiles(std::vector<Object::tileHolder> tileVector, Object::Camera camera, SDL_Renderer* renderer, int &initX, int & initY, int &clickstate, bool &held, Level level, bool mouse1, bool mouse1held, bool mouse1Released, int x, int y){
     SDL_Rect heldRect;
-    if(event.mouse1 && clickstate == 0){
-        heldRect.x = event.mouseX + camera.x;
-        heldRect.y = event.mouseY + camera.y;
+    if(mouse1 && clickstate == 0){
+        heldRect.x = x + camera.x;
+        heldRect.y = y + camera.y;
         initX = heldRect.x;
         initY = heldRect.y;
         heldRect.w = 0;
         heldRect.h = 0;
         clickstate = 1;
     }
-    if(event.mouse1held && heldRect.x != 0 && heldRect.y != 0 && clickstate == 1){
+    if(mouse1held && heldRect.x != 0 && heldRect.y != 0 && clickstate == 1){
         heldRect.x = initX - camera.x;
         heldRect.y = initY - camera.y;
-        heldRect.w = event.mouseX - heldRect.x;
-        heldRect.h = event.mouseY - heldRect.y;
+        heldRect.w = x - heldRect.x;
+        heldRect.h = y - heldRect.y;
         SDL_RenderDrawRect(renderer, &heldRect);
     }
-    if(held && !event.mouse1held){
+    if(held && !mouse1held){
         clickstate = 2;
     }
-    held = event.mouse1held;
-    if (event.mouse1Released && heldRect.x != 0 && heldRect.y != 0 && clickstate == 2) {
+    held = mouse1held;
+    if (mouse1Released && heldRect.x != 0 && heldRect.y != 0 && clickstate == 2) {
         int xAmount = abs(round(heldRect.w / TILE_WIDTH));
         int yAmount = abs(round(heldRect.h / TILE_HEIGHT));
         int spX = round((heldRect.x + camera.x)/TILE_WIDTH) * TILE_WIDTH;
