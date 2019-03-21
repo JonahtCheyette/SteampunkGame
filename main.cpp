@@ -25,8 +25,9 @@ int main(int argc, char * args[]) {
         Dper.h = 0;
         Dper.held = false;
         Dper.moveSpeed = 5;
+        Dper.create = true;
     }
-    std::string mode = "create";
+    std::string type = "dra";
     
     int whichLevel = 0;
     
@@ -75,7 +76,13 @@ int main(int argc, char * args[]) {
                 move.moveCamera(camera, player, levels[whichLevel]);
             } else {
                 Dper.moveCamera(camera, event);
-                Dper.editLevel(camera, tileVector, levels[whichLevel], renderer, event, tiles.loadedLevel);
+                if(type == "drag"){
+                    Dper.editLevel(camera, tileVector, levels[whichLevel], renderer, event, tiles.loadedLevel);
+                } else {
+                    Dper.editAssets(camera, event, levels[whichLevel]);
+                }
+                Dper.createSwitch(event);
+                Dper.typeSwitch(event, type);
             }
             
             levels[whichLevel].background.drawBackground(renderer, camera);

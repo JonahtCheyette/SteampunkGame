@@ -62,9 +62,17 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
                     } else {
                         ty = -1 * (j * TILE_HEIGHT + TILE_HEIGHT) + spY;
                     }
-                    Object::Tile t(tx, ty, tileVector[0].friction);
-                    t.texture = tileVector[0].single;
-                    tileGrid.push_back(t);
+                    if(create){
+                        Object::Tile t(tx, ty, tileVector[0].friction);
+                        t.texture = tileVector[0].single;
+                        tileGrid.push_back(t);
+                    } else {
+                        for(int k = 0; k < tileGrid.size(); k++){
+                            if(tileGrid[k].x == tx && tileGrid[k].y == ty){
+                                tileGrid.erase(tileGrid.begin() + k);
+                            }
+                        }
+                    }
                 }
             }
             std::vector<std::vector<float>> grid;
@@ -97,9 +105,17 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
                     }
                 }
             }
-            for(int i = sx; i < fx; i++){
-                for(int j = sy; j < fy; j++){
-                    grid[j][i] = 1;
+            if(create){
+                for(int i = sx; i < fx; i++){
+                    for(int j = sy; j < fy; j++){
+                        grid[j][i] = 1;
+                    }
+                }
+            } else {
+                for(int i = sx; i < fx; i++){
+                    for(int j = sy; j < fy; j++){
+                        grid[j][i] = 0;
+                    }
                 }
             }
             int correctindex = -1;
@@ -111,7 +127,9 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
                 }
             }
             for(int i = (int) (grid.size() - 1); i > correctindex; i--){
-                grid.pop_back();
+                if(grid.size() != 1){
+                    grid.pop_back();
+                }
             }
             int chopEnd = -1;
             for(int i = 0; i < grid.size(); i++){
@@ -123,7 +141,9 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
             }
             for(int i = 0; i < grid.size(); i++){
                 for(int j = (int) (grid[i].size() - 1); j > chopEnd ; j--){
-                    grid[i].pop_back();
+                    if(!(i == 0 && grid[i].size() == 1)){
+                        grid[i].pop_back();
+                    }
                 }
             }
             std::ofstream mFile(level.path + "tiles.txt", std::ofstream::out | std::ofstream::trunc);
@@ -135,7 +155,7 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
                     }
                     l += std::to_string((int) grid[i][j]);
                 }
-                if(i != grid.size() + 1){
+                if(i != grid.size() - 1){
                     l += "\n";
                 }
                 mFile << l;
@@ -143,5 +163,48 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
             mFile.close();
         }
         clickstate = 0;
+    }
+}
+
+void developer::editAssets(Object::Camera c,Event e, Level &l){
+    if(e.mouse1){
+        if(create){
+            Object::Point newPoint(e.mouseX + c.x, e.mouseY + c.y, "hook");
+            l.hookList.push_back(newPoint);
+        } else {
+            for(int i = 0; i < l.hookList.size(); i++){
+                if(sqrt(pow(l.hookList[i].x - (e.mouseX + c.x),2) + pow(l.hookList[i].y - (e.mouseY + c.y),2)) <= 50){
+                    l.hookList.erase(l.hookList.begin() + i);
+                }
+            }
+        }
+        std::ofstream hFile(l.path + "hooks.txt", std::ofstream::out | std::ofstream::trunc);
+        for(int i = 0; i < l.hookList.size(); i++){
+            std::string s = "";
+            s += std::to_string((int)l.hookList[i].x);
+            s += " ";
+            s += std::to_string((int)l.hookList[i].y);
+            if(i != l.hookList.size() + 1){
+                s += "\n";
+            }
+            hFile << s;
+        }
+        hFile.close();
+    }
+}
+
+void developer::createSwitch(Event e){
+    if(e.keyboard_state_array[SDL_SCANCODE_Q]){
+        create = !create;
+    }
+}
+
+void developer::typeSwitch(Event e, std::string &type){
+    if(e.keyboard_state_array[SDL_SCANCODE_E]){
+        if(type == "drag"){
+            type = "click";
+        } else {
+            type = "drag";
+        }
     }
 }
