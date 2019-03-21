@@ -41,7 +41,7 @@ static Tiles tiles;
 #include "loader.h"
 static Loader loader;
 #include "developerMode.h"
-static developerMode developer;
+static developer Dper;
 
 constexpr auto SCREEN_WIDTH = (1920 / 3) * 2; // accounting for scaling on personal device
 constexpr auto SCREEN_HEIGHT = (1080 / 3) * 2;

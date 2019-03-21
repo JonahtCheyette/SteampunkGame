@@ -28,5 +28,7 @@ Level Level::levelInit(std::string path, SDL_Renderer* renderer){
         level.width = SCREEN_WIDTH;
     }
     level.background.backgroundInit(path + "background.txt", renderer);
+    mapFile.close();
+    hookFile.close();
     return level;
 }

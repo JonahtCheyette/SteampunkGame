@@ -6,6 +6,7 @@ void backGround::backgroundInit(std::string path, SDL_Renderer* renderer){
         Object::Layer la(s, w, h, "Steampunk-Game/Assets/Images/backgrounds/" + iPath, renderer);
         l.push_back(la);
     }
+    data.close();
 }
 
 void backGround::drawBackground(SDL_Renderer* renderer, Object::Camera c){

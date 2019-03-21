@@ -17,10 +17,14 @@ int main(int argc, char * args[]) {
     loader.loadLevels(levels, "Steampunk-Game/Levels", renderer);
     
     bool dMode = true;
+    int extraFrame = 0;
+    int clickstate = 0;
     int initX = 0;
     int initY = 0;
-    int clickstate = 0;
+    int initW = 0;
+    int initH = 0;
     bool held = false;
+    std::string mode = "create";
     
     int whichLevel = 0;
     
@@ -45,19 +49,16 @@ int main(int argc, char * args[]) {
         
 		menu.mainMenuButtons(event.mouseX, event.mouseY, event.mouse1, event.quit, event.inGame);
 		menu.drawMainMenu(renderer);
-        event.clear(e);
 		while (event.inGame) {//game loop
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 			SDL_RenderClear(renderer);
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
             
-			event.update(e);
 			//key presses
-			SDL_PollEvent(&e);
+            event.update(e);
 			event.keyboard_state_array = SDL_GetKeyboardState(NULL);
 			if (event.keyboard_state_array[SDL_SCANCODE_ESCAPE]) menu.pauseMenuOpen = true;
 			while (menu.pauseMenuOpen && !event.quit) {
-				event.update(e);
 				menu.drawPauseMenu(renderer);
 				menu.pauseMenuButtons(event.mouseX, event.mouseY, event.mouse1, event.quit, menu.pauseMenuOpen);
 
@@ -71,10 +72,21 @@ int main(int argc, char * args[]) {
 
                 move.moveCamera(camera, player, levels[whichLevel]);
             } else {
-                developer.moveCamera(camera);
-                //developer.addTiles(tileVector, camera, renderer, initX, initY, clickstate, held, levels[whichLevel], event.mouse1, event.mouse1held, event.mouse1Released, event.mouseX, event.mouseY);
+                if(event.keyboard_state_array[SDL_SCANCODE_W]) camera.y -= 5;
+                if(event.keyboard_state_array[SDL_SCANCODE_S]) camera.y += 5;
+                if(event.keyboard_state_array[SDL_SCANCODE_A]) camera.x -= 5;
+                if(event.keyboard_state_array[SDL_SCANCODE_D]) camera.x += 5;
+                if(camera.x < 0) camera.x = 0;
+                if(camera.y < 0) camera.y = 0;
+                if(extraFrame == 2){
+                    Dper.addTiles(camera, clickstate, initX, initY, initW, initH, held, tileVector, levels[whichLevel], renderer, event, tiles.loadedLevel);
+                } else {
+                    extraFrame++;
+                }
+                /*
                 SDL_Rect heldRect;
                 if(event.mouse1 && clickstate == 0){
+                    std::cout<<"e"<<std::endl;
                     heldRect.x = event.mouseX + camera.x;
                     heldRect.y = event.mouseY + camera.y;
                     initX = heldRect.x;
@@ -84,6 +96,7 @@ int main(int argc, char * args[]) {
                     clickstate = 1;
                 }
                 if(event.mouse1held && heldRect.x != 0 && heldRect.y != 0 && clickstate == 1){
+                    std::cout<<"l"<<std::endl;
                     heldRect.x = initX - camera.x;
                     heldRect.y = initY - camera.y;
                     heldRect.w = event.mouseX - heldRect.x;
@@ -95,8 +108,10 @@ int main(int argc, char * args[]) {
                 }
                 held = event.mouse1held;
                 if (event.mouse1Released && heldRect.x != 0 && heldRect.y != 0 && clickstate == 2) {
+                    std::cout<<"p"<<std::endl;
                     int xAmount = abs(round(heldRect.w / TILE_WIDTH));
                     int yAmount = abs(round(heldRect.h / TILE_HEIGHT));
+                    if(xAmount < 1000){
                     int spX = round((heldRect.x + camera.x)/TILE_WIDTH) * TILE_WIDTH;
                     int spY = round((heldRect.y + camera.y)/TILE_HEIGHT) * TILE_HEIGHT;
                     int tx, ty;
@@ -151,7 +166,7 @@ int main(int argc, char * args[]) {
                         for(int i = 0; i <= fy - grid.size() + 2; i++){
                             std::vector<float> row;
                             for(int j = 0; j < grid[0].size(); j++){
-                                row.push_back(0);
+                                    row.push_back(0);
                             }
                             grid.push_back(row);
                         }
@@ -159,7 +174,7 @@ int main(int argc, char * args[]) {
                     if(fx >= grid[0].size()){
                         for(int i = 0; i < grid.size(); i++){
                             for(int j = 0; j <= fx - grid[0].size(); j++){
-                                grid[i].push_back(0);
+                                    grid[i].push_back(0);
                             }
                         }
                     }
@@ -207,8 +222,9 @@ int main(int argc, char * args[]) {
                         mFile << l;
                     }
                     mFile.close();
+                    }
                     clickstate = 0;
-                }
+                }*/
             }
             
             levels[whichLevel].background.drawBackground(renderer, camera);
