@@ -204,7 +204,7 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Object::Player &a
                 } else if ((a.y - a.hitbox.height / 2) >= (bEdge + a.velY)){
                     a.y = bEdge + a.hitbox.height / 2;
                     a.velY = 0;
-                } else if ((a.x - a.hitbox.width / 2) >= (rEdge + a.velX)){
+                } else if ((a.x - a.hitbox.width / 2) >= (rEdge + a.velX - 0.01)){
                     a.x = rEdge + a.hitbox.width / 2;
                     a.velX = 0;
                 } else {

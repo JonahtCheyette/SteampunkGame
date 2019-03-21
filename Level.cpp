@@ -3,6 +3,7 @@
 Level Level::levelInit(std::string path, SDL_Renderer* renderer){
     Level level;
     level.path = path;
+    level.overlap = 0;
     std::string line;
     int a, b;
     std::string type;
@@ -26,6 +27,9 @@ Level Level::levelInit(std::string path, SDL_Renderer* renderer){
     level.width = (int) level.tileGrid[0].size() * TILE_WIDTH;
     if(level.width < SCREEN_WIDTH){
         level.width = SCREEN_WIDTH;
+    }
+    if(level.height < SCREEN_HEIGHT){
+        level.overlap = level.height - SCREEN_HEIGHT;
     }
     level.background.backgroundInit(path + "background.txt", renderer);
     mapFile.close();

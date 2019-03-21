@@ -5,7 +5,7 @@ class Level {
 public:
     static Level levelInit(std::string path, SDL_Renderer* renderer);
     
-    
+    int overlap;
     int height;
     int width;
     std::string path;

@@ -60,13 +60,14 @@ void Move::movePlayer(Object::Player &a, SDL_Event& e, Level l, Object::Camera c
     a.airborne = true;
     if(a.hitbox.x + a.hitbox.width / 2 > l.width){
         a.x = l.width - (a.hitbox.width/2);
+        a.velX = 0;
     }
 	if (a.hitbox.x - a.hitbox.width / 2 < 0) {
 		a.x = a.hitbox.width / 2;
 		a.velX = 0;
 	}
-    if(a.y - a.hitbox.height / 2 < 0){
-        a.y = a.hitbox.height / 2;
+    if(a.y - a.hitbox.height / 2 < l.overlap){
+        a.y =  l. overlap + a.hitbox.height / 2;
         a.velY = 0;
     }
     //making it so that the hook doesn't change every frame you hold down an arrow

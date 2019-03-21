@@ -16,7 +16,7 @@ int main(int argc, char * args[]) {
     loader.loadTiles(tileVector, "Steampunk-Game/tData", renderer);
     loader.loadLevels(levels, "Steampunk-Game/Levels", renderer);
     
-    bool dMode = true;
+    bool dMode = false;
     if(dMode){
         Dper.clickstate = 0;
         Dper.x = 0;
@@ -27,7 +27,7 @@ int main(int argc, char * args[]) {
         Dper.moveSpeed = 5;
         Dper.create = true;
     }
-    std::string type = "dra";
+    std::string type = "drag";
     
     int whichLevel = 0;
     
