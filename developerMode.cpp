@@ -1,19 +1,28 @@
 #include "stdafx.h"
 
-void developer::addTiles(Object::Camera camera, int &clickstate, int &initX, int &initY, int &W, int &H, bool &held, std::vector<Object::tileHolder> tileVector, Level level, SDL_Renderer* renderer, Event event, std::vector<Object::Tile> &tileGrid){
+void developer::moveCamera(Object::Camera &camera, Event event){
+    if(event.keyboard_state_array[SDL_SCANCODE_W]) camera.y -= moveSpeed;
+    if(event.keyboard_state_array[SDL_SCANCODE_S]) camera.y += moveSpeed;
+    if(event.keyboard_state_array[SDL_SCANCODE_A]) camera.x -= moveSpeed;
+    if(event.keyboard_state_array[SDL_SCANCODE_D]) camera.x += moveSpeed;
+    if(camera.x < 0) camera.x = 0;
+    if(camera.y < 0) camera.y = 0;
+}
+
+void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder> tileVector, Level level, SDL_Renderer *renderer, Event event, std::vector<Object::Tile> &tileGrid){
     if(event.mouse1 && clickstate == 0){
-        initX = event.mouseX + camera.x;
-        initY = event.mouseY + camera.y;
+        x = event.mouseX + camera.x;
+        y = event.mouseY + camera.y;
         clickstate = 1;
     }
     if(event.mouse1held && clickstate == 1){
         SDL_Rect heldRect;
-        heldRect.x = initX - camera.x;
-        heldRect.y = initY - camera.y;
+        heldRect.x = x - camera.x;
+        heldRect.y = y - camera.y;
         heldRect.w = event.mouseX - heldRect.x;
         heldRect.h = event.mouseY - heldRect.y;
-        W = heldRect.w;
-        H = heldRect.h;
+        w = heldRect.w;
+        h = heldRect.h;
         SDL_RenderDrawRect(renderer, &heldRect);
     }
     if(held && !event.mouse1held){
@@ -21,34 +30,34 @@ void developer::addTiles(Object::Camera camera, int &clickstate, int &initX, int
     }
     held = event.mouse1held;
     if (event.mouse1Released && clickstate == 2) {
-        int xAmount = abs(round(W/ TILE_WIDTH));
-        int yAmount = abs(round(H/ TILE_HEIGHT));
+        int xAmount = abs(round(w/ TILE_WIDTH));
+        int yAmount = abs(round(h/ TILE_HEIGHT));
         if(xAmount < 1000 && xAmount != 0){
-            int spX = round(initX/TILE_WIDTH) * TILE_WIDTH;
-            int spY = round(initY/TILE_HEIGHT) * TILE_HEIGHT;
+            int spX = round(x/TILE_WIDTH) * TILE_WIDTH;
+            int spY = round(y/TILE_HEIGHT) * TILE_HEIGHT;
             int tx, ty;
             int sx = (spX/TILE_WIDTH);
             int fx = (spX/TILE_WIDTH);
             int sy = (spY/TILE_HEIGHT);
             int fy = (spY/TILE_HEIGHT);
-            if(W > 0){
+            if(w > 0){
                 fx += xAmount;
             } else {
                 sx -= xAmount;
             }
-            if(H > 0){
+            if(h > 0){
                 fy += yAmount;
             } else {
                 sy -= yAmount;
             }
             for(int i = 0; i < xAmount; i++){
                 for(int j = 0; j < yAmount; j++){
-                    if(W > 0){
+                    if(w > 0){
                         tx = (i * TILE_WIDTH) + spX;
                     } else {
                         tx = -1 * (i * TILE_WIDTH + TILE_WIDTH) + spX;
                     }
-                    if(H > 0){
+                    if(h > 0){
                         ty = (j * TILE_HEIGHT) + spY;
                     } else {
                         ty = -1 * (j * TILE_HEIGHT + TILE_HEIGHT) + spY;
@@ -136,4 +145,3 @@ void developer::addTiles(Object::Camera camera, int &clickstate, int &initX, int
         clickstate = 0;
     }
 }
-

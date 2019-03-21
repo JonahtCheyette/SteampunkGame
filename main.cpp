@@ -17,13 +17,15 @@ int main(int argc, char * args[]) {
     loader.loadLevels(levels, "Steampunk-Game/Levels", renderer);
     
     bool dMode = true;
-    int extraFrame = 0;
-    int clickstate = 0;
-    int initX = 0;
-    int initY = 0;
-    int initW = 0;
-    int initH = 0;
-    bool held = false;
+    if(dMode){
+        Dper.clickstate = 0;
+        Dper.x = 0;
+        Dper.y = 0;
+        Dper.w = 0;
+        Dper.h = 0;
+        Dper.held = false;
+        Dper.moveSpeed = 5;
+    }
     std::string mode = "create";
     
     int whichLevel = 0;
@@ -72,159 +74,8 @@ int main(int argc, char * args[]) {
 
                 move.moveCamera(camera, player, levels[whichLevel]);
             } else {
-                if(event.keyboard_state_array[SDL_SCANCODE_W]) camera.y -= 5;
-                if(event.keyboard_state_array[SDL_SCANCODE_S]) camera.y += 5;
-                if(event.keyboard_state_array[SDL_SCANCODE_A]) camera.x -= 5;
-                if(event.keyboard_state_array[SDL_SCANCODE_D]) camera.x += 5;
-                if(camera.x < 0) camera.x = 0;
-                if(camera.y < 0) camera.y = 0;
-                if(extraFrame == 2){
-                    Dper.addTiles(camera, clickstate, initX, initY, initW, initH, held, tileVector, levels[whichLevel], renderer, event, tiles.loadedLevel);
-                } else {
-                    extraFrame++;
-                }
-                /*
-                SDL_Rect heldRect;
-                if(event.mouse1 && clickstate == 0){
-                    std::cout<<"e"<<std::endl;
-                    heldRect.x = event.mouseX + camera.x;
-                    heldRect.y = event.mouseY + camera.y;
-                    initX = heldRect.x;
-                    initY = heldRect.y;
-                    heldRect.w = 0;
-                    heldRect.h = 0;
-                    clickstate = 1;
-                }
-                if(event.mouse1held && heldRect.x != 0 && heldRect.y != 0 && clickstate == 1){
-                    std::cout<<"l"<<std::endl;
-                    heldRect.x = initX - camera.x;
-                    heldRect.y = initY - camera.y;
-                    heldRect.w = event.mouseX - heldRect.x;
-                    heldRect.h = event.mouseY - heldRect.y;
-                    SDL_RenderDrawRect(renderer, &heldRect);
-                }
-                if(held && !event.mouse1held){
-                    clickstate = 2;
-                }
-                held = event.mouse1held;
-                if (event.mouse1Released && heldRect.x != 0 && heldRect.y != 0 && clickstate == 2) {
-                    std::cout<<"p"<<std::endl;
-                    int xAmount = abs(round(heldRect.w / TILE_WIDTH));
-                    int yAmount = abs(round(heldRect.h / TILE_HEIGHT));
-                    if(xAmount < 1000){
-                    int spX = round((heldRect.x + camera.x)/TILE_WIDTH) * TILE_WIDTH;
-                    int spY = round((heldRect.y + camera.y)/TILE_HEIGHT) * TILE_HEIGHT;
-                    int tx, ty;
-                    int sx = (spX/TILE_WIDTH);
-                    int fx = (spX/TILE_WIDTH);
-                    int sy = (spY/TILE_HEIGHT);
-                    int fy = (spY/TILE_HEIGHT);
-                    if(heldRect.w > 0){
-                        fx += xAmount;
-                    } else {
-                        sx -= xAmount;
-                    }
-                    if(heldRect.h > 0){
-                        fy += yAmount;
-                    } else {
-                        sy -= yAmount;
-                    }
-                    for(int i = 0; i < xAmount; i++){
-                        for(int j = 0; j < yAmount; j++){
-                            if(heldRect.w > 0){
-                                tx = (i * TILE_WIDTH) + spX;
-                            } else {
-                                tx = -1 * (i * TILE_WIDTH + TILE_WIDTH) + spX;
-                            }
-                            if(heldRect.h > 0){
-                                ty = (j * TILE_HEIGHT) + spY;
-                            } else {
-                                ty = -1 * (j * TILE_HEIGHT + TILE_HEIGHT) + spY;
-                            }
-                            Object::Tile t(tx, ty, tileVector[0].friction);
-                            t.texture = tileVector[0].single;
-                            tiles.loadedLevel.push_back(t);
-                        }
-                    }
-                    std::vector<std::vector<float>> grid;
-                    std::string line;
-                    std::ifstream mapFile(levels[whichLevel].path + "tiles.txt");
-                    while(std::getline(mapFile, line)){
-                        std::vector <float> row;
-                        for(int j = 0; j < line.length(); j++){
-                            if(!isspace(line[j])){
-                                row.push_back((float) line[j] - 48);
-                            }
-                        }
-                        if(row.size() != 0){
-                            grid.push_back(row);
-                        }
-                    }
-                    mapFile.close();
-                    if(fy >= grid.size()){
-                        std::vector<float> row;
-                        for(int i = 0; i <= fy - grid.size() + 2; i++){
-                            std::vector<float> row;
-                            for(int j = 0; j < grid[0].size(); j++){
-                                    row.push_back(0);
-                            }
-                            grid.push_back(row);
-                        }
-                    }
-                    if(fx >= grid[0].size()){
-                        for(int i = 0; i < grid.size(); i++){
-                            for(int j = 0; j <= fx - grid[0].size(); j++){
-                                    grid[i].push_back(0);
-                            }
-                        }
-                    }
-                    for(int i = sx; i < fx; i++){
-                        for(int j = sy; j < fy; j++){
-                            grid[j][i] = 1;
-                        }
-                    }
-                    int correctindex = -1;
-                    for(int i = (int) (grid.size() - 1); i >= 0; i--){
-                        for(int j = 0; j < grid[i].size(); j++){
-                            if(grid[i][j] != 0 && correctindex == -1){
-                                correctindex = i;
-                            }
-                        }
-                    }
-                    for(int i = (int) (grid.size() - 1); i > correctindex; i--){
-                        grid.pop_back();
-                    }
-                    int chopEnd = -1;
-                    for(int i = 0; i < grid.size(); i++){
-                        for(int j = 0; j < grid[i].size(); j++){
-                            if(grid[i][j] != 0 && j > chopEnd){
-                                chopEnd = j;
-                            }
-                        }
-                    }
-                    for(int i = 0; i < grid.size(); i++){
-                        for(int j = (int) (grid[i].size() - 1); j > chopEnd ; j--){
-                            grid[i].pop_back();
-                        }
-                    }
-                    std::ofstream mFile(levels[whichLevel].path + "tiles.txt", std::ofstream::out | std::ofstream::trunc);
-                    for(int i = 0; i < grid.size(); i++){
-                        std::string l = "";
-                        for(int j = 0; j < grid[i].size(); j++){
-                            if(j > 0){
-                                l += " ";
-                            }
-                            l += std::to_string((int) grid[i][j]);
-                        }
-                        if(i != grid.size() + 1){
-                            l += "\n";
-                        }
-                        mFile << l;
-                    }
-                    mFile.close();
-                    }
-                    clickstate = 0;
-                }*/
+                Dper.moveCamera(camera, event);
+                Dper.editLevel(camera, tileVector, levels[whichLevel], renderer, event, tiles.loadedLevel);
             }
             
             levels[whichLevel].background.drawBackground(renderer, camera);
