@@ -10,13 +10,15 @@ int main(int argc, char * args[]) {
 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 	SDL_Event e;
     
+    Player player(renderer, draw);
+    
     std::vector<Object::tileHolder> tileVector;
     std::vector<Level> levels;
     
     loader.loadTiles(tileVector, "Steampunk-Game/tData", renderer);
     loader.loadLevels(levels, "Steampunk-Game/Levels", renderer);
     
-    bool dMode = false;
+    bool dMode = true;
     if(dMode){
         Dper.clickstate = 0;
         Dper.x = 0;
@@ -26,6 +28,11 @@ int main(int argc, char * args[]) {
         Dper.held = false;
         Dper.moveSpeed = 5;
         Dper.create = true;
+        Dper.clicked1 = false;
+        Dper.clicked2 = false;
+        Dper.clicked3 = false;
+        Dper.clicked4 = false;
+        Dper.whichTile = 0;
     }
     std::string type = "drag";
     
@@ -33,10 +40,6 @@ int main(int argc, char * args[]) {
     
     
 	Object::Camera camera;
-    
-	Object::Player player;
-	player.hitbox.width = 50;
-	player.hitbox.height = 50;
     
 	tiles.mapInit(levels[whichLevel], tileVector);
     
@@ -68,12 +71,12 @@ int main(int argc, char * args[]) {
 				SDL_RenderPresent(renderer);
 			}
             if(!dMode){
-                move.movePlayer(player, e, levels[whichLevel], camera, tiles.loadedLevel);
-                move.moveHook(player);
+                player.move(e, levels[whichLevel], camera, tiles.loadedLevel);
+                player.moveHook();
             
                 tiles.checkCollision(tiles.loadedLevel, player, tileVector);
 
-                move.moveCamera(camera, player, levels[whichLevel]);
+                object.moveCamera(camera, player.x, player.y, levels[whichLevel].width, levels[whichLevel].width);
             } else {
                 Dper.moveCamera(camera, event);
                 if(type == "drag"){
@@ -83,18 +86,19 @@ int main(int argc, char * args[]) {
                 }
                 Dper.createSwitch(event);
                 Dper.typeSwitch(event, type);
+                Dper.switchTile(event, tileVector);
             }
             
             levels[whichLevel].background.drawBackground(renderer, camera);
             
-            tiles.drawTiles(tiles.loadedLevel, camera, renderer, tileVector);
-            
             object.drawHooks(levels[whichLevel].hookList, camera, player.selectedHook, renderer);
             
             if(!dMode){
-                object.drawPlayer(player, camera, renderer);
+                player.draw(camera, renderer);
             }
 
+            tiles.drawTiles(tiles.loadedLevel, camera, renderer, tileVector);
+            
             if(player.hookState == 2) SDL_RenderDrawLine(renderer, player.x - camera.x, player.y - camera.y, player.target.x - camera.x, player.target.y - camera.y);
             if(player.hookState == 1 || player.hookState == 3) SDL_RenderDrawLine(renderer, player.x - camera.x, player.y - camera.y, player.grappleHead.x - camera.x, player.grappleHead.y - camera.y);
 			SDL_RenderPresent(renderer);

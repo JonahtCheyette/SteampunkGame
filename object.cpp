@@ -59,40 +59,13 @@ Object::AABB::AABB() {
 	height = 0;
 }
 
-Object::Tile::Tile(int x, int y, int f){
+Object::Tile::Tile(int x, int y, int f, int kind){
+    this -> kind = kind;
     this -> x = x;
     this -> y = y;
     this -> w = TILE_WIDTH;
     this -> h = TILE_HEIGHT;
     this -> f = f;
-}
-
-Object::Player::Player() {
-	x = 500;
-	y = 0;
-	velX = 0;
-	velY = 0;
-	accelX = 0;
-	accelY = Gravity;
-    mass = 20;
-
-	maxXSpeed = this -> hitbox.width + TILE_WIDTH;
-    maxYSpeed = this -> hitbox.height + TILE_HEIGHT;
-	acceleration = 5;
-    friction = 0.2;
-    
-    //vars for grapple movement
-    distance = 0;
-    pDistance = 0;
-    gX = 0;
-    gY = 0;
-    selectedHook = 0;
-
-	airborne = false;
-    grappling = false;
-    hookState = 0;
-    changedHook = false;
-    crouching = false;
 }
 
 Object::tileHolder::tileHolder(int kind, float tileNum, float friction, std::string path, SDL_Renderer* renderer){
@@ -132,22 +105,16 @@ Object::Layer::Layer(float s, int w, int h, std::string path, SDL_Renderer* rend
     this -> h = h;
 }
 
-void Object::drawPlayer(Player a, Camera b, SDL_Renderer* renderer) {
-	SDL_Rect destination;
-	destination.x = a.x - a.hitbox.width / 2 - b.x;
-	destination.y = a.y - a.hitbox.height / 2 - b.y;
-	destination.w = a.hitbox.width;
-	destination.h = a.hitbox.height;
-/*
-    if(a.crouching){
-        destination.h /= 2;
-        destination.y += destination.h;
-    }
-    */
-	SDL_RenderCopy(renderer, player, nullptr, &destination);
-}
-
 void Object:: textureInit(SDL_Renderer* renderer){
     player = draw.loadTexture("Steampunk-Game/Assets/Images/Characters/Square.png", renderer);
     single = draw.loadTexture("Steampunk-Game/Assets/Images/tileTextures/test1/single.png", renderer);
+}
+
+void Object:: moveCamera(Camera &a, int x, int y, int w, int h){
+    a.x = (x / 2) - SCREEN_WIDTH / 2;
+    a.y = (y / 2) - SCREEN_HEIGHT / 2;
+    if(a.x + SCREEN_WIDTH > w) a.x = w - SCREEN_WIDTH;
+    if (a.x < 0) a.x = 0;
+    if(a.y < 0) a.y = 0;
+    if(a.y + SCREEN_HEIGHT > h) a.y = h -SCREEN_HEIGHT;
 }

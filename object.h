@@ -39,43 +39,14 @@ class Object {
 
 			AABB();
 		};
-
-		struct Player {
-			AABB hitbox;
-			float x, y;
-			float velX, velY;
-			float accelX, accelY;
-            float mass;
-
-			float maxXSpeed;
-            float maxYSpeed;
-			float acceleration;
-            float friction;
-            float distance;
-            float pDistance;
-            float gX;
-            float gY;
-            float grappleSpeed;
-            int selectedHook;
-            
-			bool airborne;
-            bool grappling;
-            int hookState;
-            bool changedHook;
-            bool crouching;
-            
-            Object::Point target;
-            Object::Point grappleHead;
-
-			Player();
-		};
     
         struct Tile {
+            int kind;
             int x, y;
             int w, h;
             int f;
             SDL_Texture* texture;
-            Tile (int x, int y, int f);
+            Tile (int x, int y, int f, int kind);
         };
     
         struct tileHolder {
@@ -120,5 +91,5 @@ class Object {
             Layer(float s, int w, int h, std::string path, SDL_Renderer* renderer);
         };
     
-		void drawPlayer(Player a, Camera b, SDL_Renderer* renderer);
+        void moveCamera(Camera &a, int x, int y, int w, int h);
 };

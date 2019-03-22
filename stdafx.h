@@ -28,14 +28,14 @@
 static Object object;
 #include "background.h"
 #include "Level.h"
+#include "physicsApplied.h"
 #include "event.h"
 static Event event;
 #include "menu.h"
 static Menu menu;
-#include "move.h"
-static Move move;
 #include "draw.h"
 static Draw draw;
+#include "Player.h"
 #include "tiles.h"
 static Tiles tiles;
 #include "loader.h"

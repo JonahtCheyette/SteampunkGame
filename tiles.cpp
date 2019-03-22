@@ -2,11 +2,11 @@
 
 void Tiles::mapInit(Level level, std::vector<Object::tileHolder> t) {
     for(int i = 0; i < t.size(); i++){
-        if(t[i].tileNum > 0){
+        if(t[i].tileNum != 0){
             for (int y = 0; y < level.tileGrid.size(); y++){
                 for(int x = 0; x < level.tileGrid[y].size(); x++){
                     if(level.tileGrid[y][x] == t[i].tileNum){
-                        Object::Tile tile(x * TILE_WIDTH, y * TILE_HEIGHT, t[i].friction);
+                        Object::Tile tile(x * TILE_WIDTH, y * TILE_HEIGHT, t[i].friction, t[i].kind);
                         above = false;
                         below = false;
                         toTheRight = false;
@@ -39,76 +39,88 @@ void Tiles::mapInit(Level level, std::vector<Object::tileHolder> t) {
                                 toTheRight = true;
                             }
                         }
-                        if(above){
-                            if(below){
+                        if(t[i].kind == 0){
+                            if(above){
+                                if(below){
+                                    if(toTheRight){
+                                        if(toTheLeft){
+                                            //center
+                                            tile.texture = t[i].center;
+                                        } else {
+                                            //left
+                                            tile.texture = t[i].left;
+                                        }
+                                    } else {
+                                        if(toTheLeft){
+                                            //right
+                                            tile.texture = t[i].right;
+                                        } else {
+                                            //wall
+                                            tile.texture = t[i].wall;
+                                        }
+                                    }
+                                } else {
+                                    if(toTheRight){
+                                        if(toTheLeft){
+                                            //bottom
+                                            tile.texture = t[i].bottom;
+                                        } else {
+                                            //bottomleft
+                                            tile.texture = t[i].bottomLeft;
+                                        }
+                                    } else {
+                                        if(toTheLeft){
+                                            //bottomright
+                                            tile.texture = t[i].bottomRight;
+                                        } else {
+                                            //bottomstickout
+                                            tile.texture = t[i].bottomStickOut;
+                                        }
+                                    }
+                                }
+                            } else if (below) {
                                 if(toTheRight){
                                     if(toTheLeft){
-                                        //center
-                                        tile.texture = t[i].center;
+                                        //top
+                                        tile.texture = t[i].top;
                                     } else {
-                                        //left
-                                        tile.texture = t[i].left;
+                                        //topleft
+                                        tile.texture = t[i].topLeft;
                                     }
                                 } else {
                                     if(toTheLeft){
-                                        //right
-                                        tile.texture = t[i].right;
+                                        //topright
+                                        tile.texture = t[i].topRight;
                                     } else {
-                                        //wall
-                                        tile.texture = t[i].wall;
+                                        //topstickout
+                                        tile.texture = t[i].topStickOut;
                                     }
                                 }
-                            } else {
+                            } else if (toTheLeft) {
                                 if(toTheRight){
-                                    if(toTheLeft){
-                                        //bottom
-                                        tile.texture = t[i].bottom;
-                                    } else {
-                                        //bottomleft
-                                        tile.texture = t[i].bottomLeft;
-                                    }
+                                    //ceiling
+                                    tile.texture = t[i].ceiling;
                                 } else {
-                                    if(toTheLeft){
-                                        //bottomright
-                                        tile.texture = t[i].bottomRight;
-                                    } else {
-                                        //bottomstickout
-                                        tile.texture = t[i].bottomStickOut;
-                                    }
+                                    //rightstickout
+                                    tile.texture = t[i].rightStickOut;
                                 }
-                            }
-                        } else if (below) {
-                            if(toTheRight){
-                                if(toTheLeft){
-                                    //top
-                                    tile.texture = t[i].top;
-                                } else {
-                                    //topleft
-                                    tile.texture = t[i].topLeft;
-                                }
+                            } else if (toTheRight){
+                                //leftstickout
+                                tile.texture = t[i].leftStickOut;
                             } else {
-                                if(toTheLeft){
-                                    //topright
-                                    tile.texture = t[i].topRight;
-                                } else {
-                                    //topstickout
-                                    tile.texture = t[i].topStickOut;
-                                }
+                                //single
+                                tile.texture = t[i].single;
                             }
-                        } else if (toTheLeft) {
-                            if(toTheRight){
-                                //ceiling
-                                tile.texture = t[i].ceiling;
+                        } else if (t[i].kind == 1){
+                            if(toTheRight && toTheLeft){
+                                tile.texture = t[i].passThrough;
+                            } else if (toTheRight){
+                                tile.texture = t[i].passThroughLeft;
+                            } else if (toTheLeft){
+                                tile.texture = t[i].passThroughRight;
                             } else {
-                                //rightstickout
-                                tile.texture = t[i].rightStickOut;
+                                tile.texture = t[i].passThroughBoth;
                             }
-                        } else if (toTheRight){
-                            //leftstickout
-                            tile.texture = t[i].leftStickOut;
-                        } else {
-                            //single
-                            tile.texture = t[i].single;
                         }
                         loadedLevel.push_back(tile);
                     }
@@ -134,7 +146,7 @@ void Tiles::drawTiles(std::vector<Object::Tile> tileGrid, Object::Camera camera,
 	}
 }
 
-void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Object::Player &a, std::vector<Object::tileHolder> t) {
+void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Player &a, std::vector<Object::tileHolder> t) {
     colOverlap = 0;
     xOverlap = 0;
     yOverlap = 0;
@@ -147,8 +159,13 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Object::Player &a
     for (int i = 0; i < tileGrid.size(); i++) {
         lEdge = tileGrid[i].x;
         rEdge = lEdge + tileGrid[i].w;
-        tEdge = tileGrid[i].y;
-        bEdge = tEdge + tileGrid[i].h;
+        if(tileGrid[i].kind == 0){
+            tEdge = tileGrid[i].y;
+            bEdge = tEdge + tileGrid[i].h;
+        } else {
+            tEdge = tileGrid[i].y + (tileGrid[i].h / 2);
+            bEdge = tileGrid[i].y + tileGrid[i].h;
+        }
         if (a.x + a.hitbox.width / 2 > lEdge && a.x - a.hitbox.width / 2 < rEdge && a.y + a.hitbox.height / 2 > tEdge && a.y - a.hitbox.height / 2 < bEdge) {
             if(a.x + a.hitbox.width / 2 <= rEdge){
                 xOverlap = (a.x + a.hitbox.width / 2) - lEdge;
@@ -191,25 +208,41 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Object::Player &a
         if(overallOverlap[i] > 0){
             lEdge = tileGrid[intercepts[i]].x;
             rEdge = lEdge + tileGrid[intercepts[i]].w;
-            tEdge = tileGrid[intercepts[i]].y;
-            bEdge = tEdge + tileGrid[intercepts[i]].h;
+            if(tileGrid[intercepts[i]].kind == 0){
+                tEdge = tileGrid[intercepts[i]].y;
+                bEdge = tEdge + tileGrid[intercepts[i]].h;
+            } else {
+                tEdge = tileGrid[intercepts[i]].y + (tileGrid[intercepts[i]].h / 2);
+                bEdge = tileGrid[intercepts[i]].y + tileGrid[intercepts[i]].h;
+            }
             if (a.x + a.hitbox.width / 2 > lEdge && a.x - a.hitbox.width / 2 < rEdge && a.y +  a.hitbox.height / 2 > tEdge && a.y - a.hitbox.height / 2 < bEdge) {
-                a.friction = tileGrid[intercepts[i]].f;
-                if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY)) {
-                    a.y = tEdge - a.hitbox.height / 2;
-                    if(a.velY >= 0){
+                if(tileGrid[intercepts[i]].kind == 0){
+                    a.friction = tileGrid[intercepts[i]].f;
+                    if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY)) {
+                        a.y = tEdge - a.hitbox.height / 2;
+                        if(a.velY >= 0){
+                            a.velY = 0;
+                            a.airborne = false;
+                        }
+                    } else if ((a.y - a.hitbox.height / 2) >= (bEdge + a.velY)){
+                        a.y = bEdge + a.hitbox.height / 2;
                         a.velY = 0;
-                        a.airborne = false;
+                    } else if ((a.x - a.hitbox.width / 2) >= (rEdge + a.velX - 0.01)){
+                        a.x = rEdge + a.hitbox.width / 2;
+                        a.velX = 0;
+                    } else {
+                        a.x = lEdge - a.hitbox.width / 2;
+                        a.velX = 0;
                     }
-                } else if ((a.y - a.hitbox.height / 2) >= (bEdge + a.velY)){
-                    a.y = bEdge + a.hitbox.height / 2;
-                    a.velY = 0;
-                } else if ((a.x - a.hitbox.width / 2) >= (rEdge + a.velX - 0.01)){
-                    a.x = rEdge + a.hitbox.width / 2;
-                    a.velX = 0;
                 } else {
-                    a.x = lEdge - a.hitbox.width / 2;
-                    a.velX = 0;
+                    if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY)) {
+                        a.friction = tileGrid[intercepts[i]].f;
+                        a.y = tEdge - a.hitbox.height / 2;
+                        if(a.velY >= 0){
+                            a.velY = 0;
+                            a.airborne = false;
+                        }
+                    }
                 }
             }
         }

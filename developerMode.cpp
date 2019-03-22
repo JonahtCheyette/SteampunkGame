@@ -62,16 +62,19 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
                     } else {
                         ty = -1 * (j * TILE_HEIGHT + TILE_HEIGHT) + spY;
                     }
-                    if(create){
-                        Object::Tile t(tx, ty, tileVector[0].friction);
-                        t.texture = tileVector[0].single;
-                        tileGrid.push_back(t);
-                    } else {
-                        for(int k = 0; k < tileGrid.size(); k++){
-                            if(tileGrid[k].x == tx && tileGrid[k].y == ty){
-                                tileGrid.erase(tileGrid.begin() + k);
-                            }
+                    for(int k = 0; k < tileGrid.size(); k++){
+                        if(tileGrid[k].x == tx && tileGrid[k].y == ty){
+                            tileGrid.erase(tileGrid.begin() + k);
                         }
+                    }
+                    if(create){
+                        Object::Tile t(tx, ty, tileVector[whichTile].friction, tileVector[whichTile].kind);
+                        if(tileVector[whichTile].kind == 0){
+                            t.texture = tileVector[whichTile].single;
+                        } else {
+                            t.texture = tileVector[whichTile].passThroughBoth;
+                        }
+                        tileGrid.push_back(t);
                     }
                 }
             }
@@ -108,7 +111,7 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
             if(create){
                 for(int i = sx; i < fx; i++){
                     for(int j = sy; j < fy; j++){
-                        grid[j][i] = 1;
+                        grid[j][i] = tileVector[whichTile].tileNum;
                     }
                 }
             } else {
@@ -194,17 +197,43 @@ void developer::editAssets(Object::Camera c,Event e, Level &l){
 }
 
 void developer::createSwitch(Event e){
-    if(e.keyboard_state_array[SDL_SCANCODE_Q]){
+    if(e.keyboard_state_array[SDL_SCANCODE_Q] && !clicked1){
         create = !create;
+        clicked1 = true;
+    } else if (!e.keyboard_state_array[SDL_SCANCODE_Q]){
+        clicked1 = false;
     }
 }
 
 void developer::typeSwitch(Event e, std::string &type){
-    if(e.keyboard_state_array[SDL_SCANCODE_E]){
+    if(e.keyboard_state_array[SDL_SCANCODE_E] && !clicked2){
         if(type == "drag"){
             type = "click";
         } else {
             type = "drag";
         }
+        clicked2 = true;
+    } else if (!e.keyboard_state_array[SDL_SCANCODE_E]){
+        clicked2 = false;
+    }
+}
+
+void developer::switchTile(Event e, std::vector<Object::tileHolder> tileVector){
+    if(e.keyboard_state_array[SDL_SCANCODE_R] && ! clicked3){
+        whichTile++;
+        clicked3 = true;
+    } else if (!e.keyboard_state_array[SDL_SCANCODE_R]){
+        clicked3 = false;
+    }
+    if(e.keyboard_state_array[SDL_SCANCODE_F] && !clicked4){
+        whichTile--;
+        clicked4 = true;
+    } else if (!e.keyboard_state_array[SDL_SCANCODE_F]){
+        clicked4 = false;
+    }
+    if(whichTile > (tileVector.size() - 1)){
+        whichTile = 0;
+    } else if(whichTile < 0){
+        whichTile = (int) (tileVector.size() - 1);
     }
 }
