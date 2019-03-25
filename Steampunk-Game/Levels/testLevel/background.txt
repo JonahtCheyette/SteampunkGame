@@ -1,1 +1,1 @@
-testBackground.png 0.5 800 600
+wall_tile.png 0.5 448 620

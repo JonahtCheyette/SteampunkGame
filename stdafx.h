@@ -27,13 +27,13 @@
 #include "object.h"
 static Object object;
 #include "background.h"
-#include "Level.h"
 #include "physicsApplied.h"
 #include "event.h"
 static Event event;
 #include "menu.h"
 static Menu menu;
 #include "draw.h"
+#include "Level.h"
 static Draw draw;
 #include "Player.h"
 #include "tiles.h"

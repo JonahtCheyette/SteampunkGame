@@ -19,7 +19,7 @@ void Loader::loadTiles(std::vector<Object::tileHolder> &t, std::string path, SDL
     closedir(dr);
 }
 
-void Loader::loadLevels(std::vector<Level> &l, std::string path, SDL_Renderer* renderer){
+void Loader::loadLevels(std::vector<Level> &l, std::string path, SDL_Renderer* renderer, Draw draw){
     dr = opendir(path.c_str());
     if(dr == NULL){
         std::cout<<"could not open directory"<<std::endl;
@@ -27,7 +27,7 @@ void Loader::loadLevels(std::vector<Level> &l, std::string path, SDL_Renderer* r
         while((de = readdir(dr)) != NULL){
             fName = de -> d_name;
             if(fName != "." && fName != ".." && fName != ".DS_Store"){
-                l.push_back(Level::levelInit(path + "/" + fName + "/", renderer));
+                l.push_back(Level::levelInit(path + "/" + fName + "/", renderer, draw));
             }
         }
     }

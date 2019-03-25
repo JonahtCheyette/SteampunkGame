@@ -9,11 +9,11 @@ Player::Player(SDL_Renderer* renderer, Draw draw){
     accelY = Gravity;
     mass = 20;
     
-    hitbox.height = 50;
-    hitbox.width = 50;
+    hitbox.height = 48;
+    hitbox.width = 24;
     
-    maxXSpeed = this -> hitbox.width + TILE_WIDTH;
-    maxYSpeed = this -> hitbox.height + TILE_HEIGHT;
+    maxXSpeed = 10;
+    maxYSpeed = 10;
     acceleration = 5;
     friction = 0;
     
@@ -31,7 +31,7 @@ Player::Player(SDL_Renderer* renderer, Draw draw){
     player = draw.loadTexture("Steampunk-Game/Assets/Images/Characters/Square.png", renderer);
 }
 
-void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::Tile> tileGrid) {
+void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::Tile> tileGrid, int &which, int maxLevel) {
     
     accelY += Gravity;
     
@@ -46,13 +46,19 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
         if (event.keyboard_state_array[SDL_SCANCODE_W]){
             applyForce(0, -250);
         }
+        if (event.keyboard_state_array[SDL_SCANCODE_UP] && sqrt(pow(l.end.x - x,2) + pow(l.end.y - y,2)) < 20){
+            which ++;
+            if(which == maxLevel){
+                which = maxLevel - 1;
+            }
+        }
     }
-    if(!(event.keyboard_state_array[SDL_SCANCODE_LEFT] && event.keyboard_state_array[SDL_SCANCODE_RIGHT])){
+    if(!(event.keyboard_state_array[SDL_SCANCODE_LEFT] && event.keyboard_state_array[SDL_SCANCODE_RIGHT]) && l.hookList.size() > 0){
         if (event.keyboard_state_array[SDL_SCANCODE_LEFT]) changeHooks(l.hookList, -1, c);
         if (event.keyboard_state_array[SDL_SCANCODE_RIGHT]) changeHooks(l.hookList, 1, c);
     }
     
-    if (event.keyboard_state_array[SDL_SCANCODE_SPACE] && !grappling) {
+    if (event.keyboard_state_array[SDL_SCANCODE_SPACE] && !grappling && l.hookList.size() > 0) {
         grappling = true;
         grapple(l.hookList[selectedHook], tileGrid, c);
     } else if (!event.keyboard_state_array[SDL_SCANCODE_SPACE] && grappling){
@@ -68,6 +74,8 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
     
     if (velX > maxXSpeed) velX = maxXSpeed;
     if (velX < -maxXSpeed) velX = -maxXSpeed;
+    if(abs(velX) < 0.001) velX = 0;
+
     
     if (velY > maxYSpeed) velY = maxYSpeed;
     if (velY < -maxYSpeed) velY = -maxYSpeed;
@@ -87,6 +95,10 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
     if(hitbox.y - hitbox.height / 2 < l.overlap){
         y =  l.overlap + hitbox.height / 2;
         velY = 0;
+    }
+    if(hitbox.y - hitbox.height/2 > l.height){
+        y = l.spawn.y;
+        x = l.spawn.x;
     }
     //making it so that the hook doesn't change every frame you hold down  arrow
     if(changedHook && !(event.keyboard_state_array[SDL_SCANCODE_LEFT] || event.keyboard_state_array[SDL_SCANCODE_RIGHT])){

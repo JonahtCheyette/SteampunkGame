@@ -117,5 +117,5 @@ void Object:: moveCamera(Camera &a, int x, int y, int w, int h){
     if(a.x + SCREEN_WIDTH > w) a.x = w - SCREEN_WIDTH;
     if (a.x < 0) a.x = 0;
     if(a.y < 0) a.y = 0;
-    if(a.y + SCREEN_HEIGHT > h) a.y = h -SCREEN_HEIGHT;
+    if(a.y + SCREEN_HEIGHT > h) a.y = h - SCREEN_HEIGHT;
 }

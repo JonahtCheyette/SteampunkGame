@@ -4,7 +4,7 @@
 class Player : public physicsApplied {
 public:
     Player(SDL_Renderer* renderer, Draw draw);
-    void move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::Tile> tileGrid);
+    void move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::Tile> tileGrid, int &which, int maxLevel);
     void moveHook();
     void grapple(Object::Point b, std::vector<Object::Tile> tileGrid, Object::Camera c);
     void changeHooks(std::vector<Object:: Point> b, int change, Object::Camera c);
