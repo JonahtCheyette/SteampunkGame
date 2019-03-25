@@ -9,7 +9,6 @@ Level Level::levelInit(std::string path, SDL_Renderer* renderer){
     std::string type;
     std::ifstream mapFile(path + "tiles.txt");
     std::ifstream hookFile(path + "hooks.txt");
-    std::ifstream platformFile(path + "platforms.txt");
     while(std::getline(mapFile, line)){
         std::vector <float> row;
         for(int j = 0; j < line.length(); j++){
