@@ -59,7 +59,7 @@ Object::AABB::AABB() {
 	height = 0;
 }
 
-Object::Tile::Tile(int x, int y, int f, int kind){
+Object::Tile::Tile(int x, int y, float f, int kind){
     this -> kind = kind;
     this -> x = x;
     this -> y = y;
@@ -68,10 +68,11 @@ Object::Tile::Tile(int x, int y, int f, int kind){
     this -> f = f;
 }
 
-Object::tileHolder::tileHolder(int kind, float tileNum, float friction, std::string path, SDL_Renderer* renderer){
+Object::tileHolder::tileHolder(int kind, float tileNum, float friction, std::string path, std::string Dpath, SDL_Renderer* renderer){
     this -> kind = kind;
     this -> tileNum = tileNum;
     this -> path = path;
+    this -> Dpath = Dpath;
     this -> friction = friction;
     if(kind == 0){
         topLeft = draw.loadTexture(path + "topLeft.png", renderer);
@@ -111,8 +112,8 @@ void Object:: textureInit(SDL_Renderer* renderer){
 }
 
 void Object:: moveCamera(Camera &a, int x, int y, int w, int h){
-    a.x = (x / 2) - SCREEN_WIDTH / 2;
-    a.y = (y / 2) - SCREEN_HEIGHT / 2;
+    a.x = (x) - SCREEN_WIDTH / 2;
+    a.y = (y) - SCREEN_HEIGHT / 2;
     if(a.x + SCREEN_WIDTH > w) a.x = w - SCREEN_WIDTH;
     if (a.x < 0) a.x = 0;
     if(a.y < 0) a.y = 0;

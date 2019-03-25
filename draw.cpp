@@ -24,6 +24,34 @@ void Draw::free() {
 	}
 }
 
+SDL_Texture* Draw::loadFromRenderedText(std::string textureText, SDL_Color textColor, TTF_Font* gFont, int &w, int &h, SDL_Renderer* renderer){
+    //Get rid of preexisting texture
+    free();
+    
+    //Render text surface
+    SDL_Surface* textSurface = TTF_RenderText_Solid( gFont, textureText.c_str(), textColor );
+    if( textSurface == NULL )
+    {
+        printf( "Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError() );
+    }
+    
+    //Create texture from surface pixels
+    SDL_Texture* mTexture = SDL_CreateTextureFromSurface( renderer, textSurface );
+    if( mTexture == NULL )
+    {
+        printf( "Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError() );
+    }
+    
+    w = textSurface -> w;
+    h = textSurface -> h;
+    
+    //Get rid of old surface
+    SDL_FreeSurface( textSurface );
+    
+    //Return success
+    return mTexture;
+}
+
 void Draw::render(SDL_Renderer* renderer, int x, int y, SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip) {
 	//set rendering space
 	SDL_Rect renderQuad = { x, y, textureWidth, textureHeight };

@@ -262,8 +262,13 @@ Object::Point Tiles::checkLineCollision(std::vector<Object::Tile> tileGrid, Obje
         //x = y - b /m
         lEdge = tileGrid[i].x;
         rEdge = lEdge + tileGrid[i].w;
-        tEdge = tileGrid[i].y;
-        bEdge = tEdge + tileGrid[i].h;
+        if(tileGrid[i].kind == 0){
+            tEdge = tileGrid[i].y;
+            bEdge = tEdge + tileGrid[i].h;
+        } else {
+            tEdge = tileGrid[i].y + (tileGrid[i].h / 2);
+            bEdge = tileGrid[i].y + tileGrid[i].h;
+        }
         if(a.x < b.x){
             if(rEdge < a.x){
                 continue;
@@ -280,17 +285,20 @@ Object::Point Tiles::checkLineCollision(std::vector<Object::Tile> tileGrid, Obje
             }
         }
         if(a.y < b.y){
-            if(tEdge < a.y){
+            if(bEdge < a.y){
                 continue;
             }
-            if(bEdge > b.y){
+            if(tEdge > b.y){
                 continue;
             }
         } else {
-            if(tEdge < b.y){
+            if(tileGrid[i].kind == 1){
                 continue;
             }
-            if(bEdge > a.y){
+            if(bEdge < b.y){
+                continue;
+            }
+            if(tEdge > a.y){
                 continue;
             }
         }
@@ -298,20 +306,30 @@ Object::Point Tiles::checkLineCollision(std::vector<Object::Tile> tileGrid, Obje
         rEdgeLine = (rEdge * m) + intercept;
         tEdgeLine = (tEdge - intercept) / m;
         bEdgeLine = (bEdge - intercept) / m;
-        if(lEdgeLine <= bEdge && lEdgeLine >= tEdge){
-            lineCollided = true;
-            if(distance > sqrt(pow(a.x - lEdge,2) + pow(a.y - lEdgeLine, 2))){
-                lineCollision.y = lEdgeLine;
-                lineCollision.x = lEdge;
-                distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y, 2));
+        if(tileGrid[i].kind == 0){
+            if(lEdgeLine <= bEdge && lEdgeLine >= tEdge){
+                lineCollided = true;
+                if(distance > sqrt(pow(a.x - lEdge,2) + pow(a.y - lEdgeLine, 2))){
+                    lineCollision.y = lEdgeLine;
+                    lineCollision.x = lEdge;
+                    distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y, 2));
+                }
             }
-        }
-        if(rEdgeLine <= bEdge && rEdgeLine >= tEdge){
-            lineCollided = true;
-            if(distance > sqrt(pow(a.x - rEdge,2) + pow(a.y - rEdgeLine, 2))){
-                lineCollision.y = rEdgeLine;
-                lineCollision.x = rEdge;
-                distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y, 2));
+            if(rEdgeLine <= bEdge && rEdgeLine >= tEdge){
+                lineCollided = true;
+                if(distance > sqrt(pow(a.x - rEdge,2) + pow(a.y - rEdgeLine, 2))){
+                    lineCollision.y = rEdgeLine;
+                    lineCollision.x = rEdge;
+                    distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y, 2));
+                }
+            }
+            if(bEdgeLine <= rEdge && bEdgeLine >= lEdge){
+                lineCollided = true;
+                if(distance > sqrt(pow(a.y - bEdge,2) + pow(a.x - bEdgeLine, 2))){
+                    lineCollision.y = bEdge;
+                    lineCollision.x = bEdgeLine;
+                    distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y,2));
+                }
             }
         }
         if(tEdgeLine <= rEdge && tEdgeLine >= lEdge){
@@ -320,14 +338,6 @@ Object::Point Tiles::checkLineCollision(std::vector<Object::Tile> tileGrid, Obje
                 lineCollision.y = tEdge;
                 lineCollision.x = tEdgeLine;
                 distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y, 2));
-            }
-        }
-        if(bEdgeLine <= rEdge && bEdgeLine >= lEdge){
-            lineCollided = true;
-            if(distance > sqrt(pow(a.y - bEdge,2) + pow(a.x - bEdgeLine, 2))){
-                lineCollision.y = bEdge;
-                lineCollision.x = bEdgeLine;
-                distance = sqrt(pow(a.x - lineCollision.x,2) + pow(a.y - lineCollision.y,2));
             }
         }
     }

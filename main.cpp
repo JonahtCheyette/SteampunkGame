@@ -4,11 +4,17 @@ int main(int argc, char * args[]) {
     //for better hook control
 	//SDL_Texture* texture = nullptr;
 	SDL_Init(SDL_INIT_VIDEO);
+    TTF_Init();
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 	SDL_Window* window = SDL_CreateWindow("SDL Testing things", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// add in " | SDL_RENDERER_PRESENTVSYNC" after SDL_RENDERER_ACCELERATED for vsync
 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 	SDL_Event e;
+    SDL_Color black = {1,0,0};
+    TTF_Font* Sans = TTF_OpenFont("Steampunk-Game/Assets/Fonts/comic.ttf", 28);
+    if(Sans == NULL){
+        std::cout<<"j";
+    }
     
     Player player(renderer, draw);
     
@@ -95,6 +101,8 @@ int main(int argc, char * args[]) {
             
             if(!dMode){
                 player.draw(camera, renderer);
+            } else {
+                Dper.showEditing(draw, type, black, Sans, tileVector, renderer);
             }
 
             tiles.drawTiles(tiles.loadedLevel, camera, renderer, tileVector);
@@ -114,6 +122,7 @@ int main(int argc, char * args[]) {
 
 	//Quit SDL subsystems
 	IMG_Quit();
+    TTF_Quit();
 	SDL_Quit();
 	return 0;
 }

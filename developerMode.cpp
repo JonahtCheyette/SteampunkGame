@@ -169,6 +169,29 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
     }
 }
 
+void developer::showEditing(Draw draw, std::string type, SDL_Color color, TTF_Font* font, std::vector<Object::tileHolder> tileVector, SDL_Renderer* renderer){
+    textTexture = draw.loadFromRenderedText(type, color, font, destination.w, destination.h, renderer);
+    destination.x = 0;
+    destination.y = 0;
+    SDL_RenderCopy(renderer, textTexture, nullptr, &destination);
+    if(create){
+        textTexture = draw.loadFromRenderedText("create", color, font, destination.w, destination.h, renderer);
+    } else {
+        textTexture = draw.loadFromRenderedText("destroy", color, font, destination.w, destination.h, renderer);
+    }
+    destination.y = 50;
+    SDL_RenderCopy(renderer, textTexture, nullptr, &destination);
+    if(type == "drag"){
+        textTexture = draw.loadFromRenderedText(tileVector[whichTile].Dpath, color, font, destination.w, destination.h, renderer);
+    } else {
+        textTexture = draw.loadFromRenderedText("hook", color, font, destination.w, destination.h, renderer);
+    }
+    destination.y = 100;
+    if(create || type != "drag"){
+        SDL_RenderCopy(renderer, textTexture, nullptr, &destination);
+    }
+}
+
 void developer::editAssets(Object::Camera c,Event e, Level &l){
     if(e.mouse1){
         if(create){

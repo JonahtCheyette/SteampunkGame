@@ -10,7 +10,7 @@ void Loader::loadTiles(std::vector<Object::tileHolder> &t, std::string path, SDL
             if(fName != "." && fName != ".." && fName != ".DS_Store"){
                 std::ifstream data("Steampunk-Game/tData/" + fName);
                 while(data >> a >> b >> c >> iPath){
-                    Object::tileHolder tile(a, b, c,"Steampunk-Game/Assets/Images/tileTextures/" + iPath + "/", renderer);
+                    Object::tileHolder tile(a, b, c,"Steampunk-Game/Assets/Images/tileTextures/" + iPath + "/", iPath, renderer);
                     t.push_back(tile);
                 }
             }

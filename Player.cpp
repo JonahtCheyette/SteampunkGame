@@ -15,7 +15,7 @@ Player::Player(SDL_Renderer* renderer, Draw draw){
     maxXSpeed = this -> hitbox.width + TILE_WIDTH;
     maxYSpeed = this -> hitbox.height + TILE_HEIGHT;
     acceleration = 5;
-    friction = 0.2;
+    friction = 0;
     
     //vars for grapple movement
     distance = 0;
@@ -105,7 +105,7 @@ void Player::moveHook() {
         gY *= grappleStrength;
         grappleHead.x += gX;
         grappleHead.y += gY;
-        if(sqrt(pow(x - grappleHead.x, 2) + pow(y - grappleHead.y, 2)) <= grappleSpeed){
+        if(sqrt(pow(x - grappleHead.x, 2) + pow(y - grappleHead.y, 2)) <=  -grappleStrength){
             hookState = 0;
         }
     } else if(hookState == 1){

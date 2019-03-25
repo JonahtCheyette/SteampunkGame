@@ -44,9 +44,9 @@ class Object {
             int kind;
             int x, y;
             int w, h;
-            int f;
+            float f;
             SDL_Texture* texture;
-            Tile (int x, int y, int f, int kind);
+            Tile (int x, int y, float f, int kind);
         };
     
         struct tileHolder {
@@ -54,6 +54,7 @@ class Object {
             float tileNum;
             float friction;
             std::string path;
+            std::string Dpath;
             
             //RELEASE THE HOUNDS
             //FOR REGULAR TILES
@@ -80,7 +81,7 @@ class Object {
             SDL_Texture* passThroughRight;
             SDL_Texture* passThroughBoth;
             
-            tileHolder(int kind, float tileNum, float friction, std::string path, SDL_Renderer* renderer);
+            tileHolder(int kind, float tileNum, float friction, std::string path, std::string Dpath, SDL_Renderer* renderer);
         };
     
         struct Layer {
