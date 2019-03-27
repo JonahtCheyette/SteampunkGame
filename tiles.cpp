@@ -163,7 +163,7 @@ void Tiles::drawTiles(std::vector<Object::Tile> tileGrid, Object::Camera camera,
 	}
 }
 
-void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Player &a) {
+void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a) {
     colOverlap = 0;
     xOverlap = 0;
     yOverlap = 0;
@@ -235,7 +235,7 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Player &a) {
             if (a.x + a.hitbox.width / 2 > lEdge && a.x - a.hitbox.width / 2 < rEdge && a.y +  a.hitbox.height / 2 > tEdge && a.y - a.hitbox.height / 2 < bEdge) {
                 if(tileGrid[intercepts[i]].kind == 0 || tileGrid[intercepts[i]].kind == 2){
                     a.friction = tileGrid[intercepts[i]].f;
-                    if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY)) {
+                    if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY + 0.01)) {
                         a.y = tEdge - a.hitbox.height / 2;
                         if(a.velY >= 0){
                             a.velY = 0;
@@ -250,7 +250,7 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Player &a) {
                                 }
                             }
                         }
-                    } else if ((a.y - a.hitbox.height / 2) >= (bEdge + a.velY)){
+                    } else if ((a.y - a.hitbox.height / 2) >= (bEdge + a.velY - 0.01)){
                         a.y = bEdge + a.hitbox.height / 2;
                         a.velY = 0;
                         if(tileGrid[intercepts[i]].kind == 2){
@@ -288,7 +288,7 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Player &a) {
                         }
                     }
                 } else {
-                    if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY)) {
+                    if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY + 0.01)) {
                         a.friction = tileGrid[intercepts[i]].f;
                         a.y = tEdge - a.hitbox.height / 2;
                         if(a.velY >= 0){

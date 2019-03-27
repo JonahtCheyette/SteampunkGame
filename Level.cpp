@@ -7,11 +7,13 @@ Level Level::levelInit(std::string path, SDL_Renderer* renderer, Draw draw){
     level.spawn.x = -1;
     level.spawn.y = -1;
     std::string line;
-    int a, b;
+    float a, b, c, d, e;
+    bool v;
     std::string type;
     std::ifstream mapFile(path + "tiles.txt");
     std::ifstream hookFile(path + "hooks.txt");
     std::ifstream startend(path + "start-end.txt");
+    std::ifstream cFile(path + "Crates.txt");
     while(std::getline(mapFile, line)){
         std::vector <int> row;
         for(int j = 0; j < line.length(); j++){
@@ -23,8 +25,8 @@ Level Level::levelInit(std::string path, SDL_Renderer* renderer, Draw draw){
             level.tileGrid.push_back(row);
         }
     }
-    while(hookFile >> a >> b){
-        level.hookList.push_back(Object::Point(a, b, "hook"));
+    while(hookFile >> a >> b >> c >> d >> e >> v){
+        level.hookList.push_back({a, b, "hook", c, d, e, v});
     }
     while(startend >> a >> b){
         if(level.spawn.x == -1 && level.spawn.y == -1){
@@ -35,6 +37,9 @@ Level Level::levelInit(std::string path, SDL_Renderer* renderer, Draw draw){
             level.end.y = b;
         }
     }
+    while(cFile >> a >> b >> c >> d >> e){
+        level.crateList.push_back({a, b, c, d, renderer, draw, e});
+    }
     level.height = (int) level.tileGrid.size() * TILE_HEIGHT;
     level.width = (int) level.tileGrid[0].size() * TILE_WIDTH;
     level.Start_End = draw.loadTexture("Steampunk-Game/Assets/Images/levelBasics/SPOT.png", renderer);
@@ -44,9 +49,16 @@ Level Level::levelInit(std::string path, SDL_Renderer* renderer, Draw draw){
     if(level.height < SCREEN_HEIGHT){
         level.overlap = level.height - SCREEN_HEIGHT;
     }
+    for(int i = 0; i < level.hookList.size(); i++){
+        if(level.hookList[i].x > level.width){
+            level.width = level.hookList[i].x + 8;
+        }
+    }
     level.background.backgroundInit(path + "background.txt", renderer);
     mapFile.close();
     hookFile.close();
+    startend.close();
+    cFile.close();
     return level;
 }
 
@@ -64,5 +76,43 @@ void Level::renderEnd(Object::Camera c, SDL_Renderer* renderer){
         destination.w = TILE_WIDTH;
         destination.h = TILE_HEIGHT;
         SDL_RenderCopy(renderer, Start_End, nullptr, &destination);
+    }
+}
+
+void Level::update(physicsApplied &a, Object::Camera c){
+    for(int i = 0; i < hookList.size(); i++){
+        if (hookList[i].y > c.y - 50 && hookList[i].y < c.y + SCREEN_HEIGHT + 50 && hookList[i].x > c.x - 50 && hookList[i].x < c.x + SCREEN_WIDTH + 50){
+            if(hookList[i].vertical){
+                hookList[i].y += hookList[i].moveSpeed * hookList[i].moveDir;
+                if(hookList[i].y > hookList[i].limit1 || hookList[i].y < hookList[i].limit2){
+                    hookList[i].moveDir *= -1;
+                }
+            } else {
+                hookList[i].x += hookList[i].moveSpeed * hookList[i].moveDir;
+                if(hookList[i].x > hookList[i].limit1 || hookList[i].x < hookList[i].limit2){
+                    hookList[i].moveDir *= -1;
+                }
+            }
+        }
+    }
+    for(int i = 0; i < crateList.size(); i++){
+        if (crateList[i].y + crateList[i].hitbox.height / 2 > c.y - 50 && crateList[i].y - crateList[i].hitbox.height / 2 < c.y + SCREEN_HEIGHT + 50 && crateList[i].x + crateList[i].hitbox.width / 2 > c.x - 50 && crateList[i].x - crateList[i].hitbox.width / 2 < c.x + SCREEN_WIDTH + 50){
+            crateList[i].update();
+            crateList[i].collide(a);
+            crateList[i].doFriction();
+        }
+    }
+}
+
+void Level::draw(SDL_Renderer* renderer, Object::Camera c){
+    for(int i = 0; i < crateList.size(); i++){
+        if (crateList[i].y + crateList[i].hitbox.height / 2 > c.y && crateList[i].y - crateList[i].hitbox.height / 2 < c.y + SCREEN_HEIGHT && crateList[i].x + crateList[i].hitbox.width / 2 > c.x && crateList[i].x - crateList[i].hitbox.width / 2 < c.x + SCREEN_WIDTH){
+            SDL_Rect destination;
+            destination.x = crateList[i].x - crateList[i].hitbox.width / 2 - c.x;
+            destination.y = crateList[i].y - crateList[i].hitbox.height / 2 - c.y;
+            destination.w = crateList[i].hitbox.width;
+            destination.h = crateList[i].hitbox.height;
+            SDL_RenderCopy(renderer, crateList[i].texture, nullptr, &destination);
+        }
     }
 }

@@ -6,7 +6,7 @@ public:
     void mapInit(Level level, std::vector<Object::tileHolder> t);
     void drawTiles(std::vector<Object::Tile> tileGrid, Object::Camera camera, SDL_Renderer* renderer, std::vector<Object::tileHolder> t);
     
-    void checkCollision(std::vector<Object::Tile> tileGrid, Player &a);
+    void checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a);
     Object::Point checkLineCollision(std::vector<Object::Tile> tileGrid, Object::Point a, Object:: Point b);
     
     int intercepts[9];

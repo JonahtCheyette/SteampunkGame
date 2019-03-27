@@ -15,7 +15,25 @@ Object::Point::Point() {
 Object:: Point:: Point(float x, float y, std::string type){
     this -> x = x;
     this -> y = y;
+    this -> initX = x;
+    this -> initY = y;
     this -> type = type;
+    this -> moveDir = 1;
+    moving = false;
+}
+
+Object:: Point:: Point(float x, float y, std::string type, float limit1, float limit2, float moveSpeed, bool vertical){
+    this -> x = x;
+    this -> y = y;
+    this -> initX = x;
+    this -> initY = y;
+    this -> type = type;
+    this -> limit1 = limit1;
+    this -> limit2 = limit2;
+    this -> moveSpeed = moveSpeed;
+    this -> vertical = vertical;
+    this -> moveDir = 1;
+    moving = true;
 }
 
 void Object::drawPoint(Point a, Camera b, SDL_Renderer* renderer) {

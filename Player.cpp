@@ -15,7 +15,6 @@ Player::Player(SDL_Renderer* renderer, Draw draw){
     maxXSpeed = 10;
     maxYSpeed = 10;
     acceleration = 5;
-    friction = 0;
     
     //vars for grapple movement
     distance = 0;
@@ -26,15 +25,14 @@ Player::Player(SDL_Renderer* renderer, Draw draw){
     
     airborne = false;
     grappling = false;
+    rope = false;
     hookState = 0;
     changedHook = false;
+    clicked = false;
     player = draw.loadTexture("Steampunk-Game/Assets/Images/Characters/Square.png", renderer);
 }
 
 void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::Tile> tileGrid, int &which, int maxLevel) {
-    
-    accelY += Gravity;
-    
     //key presses
     SDL_PollEvent(&e);
     event.keyboard_state_array = SDL_GetKeyboardState(NULL);
@@ -59,6 +57,14 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
         if (event.keyboard_state_array[SDL_SCANCODE_RIGHT]) changeHooks(l.hookList, 1, c);
     }
     
+    if (event.keyboard_state_array[SDL_SCANCODE_E] && !clicked && hookState != 2) {
+        rope = !rope;
+        clicked = true;
+    }
+    if(!event.keyboard_state_array[SDL_SCANCODE_E]){
+        clicked = false;
+    }
+    
     if (event.keyboard_state_array[SDL_SCANCODE_SPACE] && !grappling && l.hookList.size() > 0) {
         grappling = true;
         grapple(l.hookList[selectedHook], tileGrid, c);
@@ -66,7 +72,6 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
         grappling = false;
     }
     
-    //friction
     if((!event.keyboard_state_array[SDL_SCANCODE_D] && velX > 0) || (!event.keyboard_state_array[SDL_SCANCODE_A] && velX < 0)){
         applyForce(velX * (-1 * friction * mass * Gravity), 0);
     }
@@ -75,7 +80,6 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
     
     if (velX > maxXSpeed) velX = maxXSpeed;
     if (velX < -maxXSpeed) velX = -maxXSpeed;
-    if(abs(velX) < 0.001) velX = 0;
 
     if(hookState == 2){
         if (velY > maxYSpeed) velY = maxYSpeed;
@@ -103,6 +107,8 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
         x = l.spawn.x;
         velX = 0;
         velY = 0;
+        grappling = false;
+        hookState = 0;
     }
     //making it so that the hook doesn't change every frame you hold down  arrow
     if(changedHook && !(event.keyboard_state_array[SDL_SCANCODE_LEFT] || event.keyboard_state_array[SDL_SCANCODE_RIGHT])){
@@ -143,21 +149,29 @@ void Player::moveHook(std::vector<Object::Point> a) {
         gX = x - target.x;
         gY = y - target.y;
         distance = sqrt(pow(gX, 2) + pow(gY, 2));
-        gX /= distance;
-        gY /= distance;
-        gX *= grappleStrength;
-        gY *= grappleStrength;
-        
-        applyForce(gX, gY);
+        if(!rope){
+            gX /= distance;
+            gY /= distance;
+            gX *= grappleStrength;
+            gY *= grappleStrength;
+            applyForce(gX, gY);
+        }
         
         if(distance > pDistance && pDistance != 0){
             gX = x - target.x;
             gY = y - target.y;
             gX /= distance;
             gY /= distance;
-            gX *= -10 * (distance - pDistance);
-            gY *= -10 * (distance - pDistance);
-            applyForce(gX, gY);
+            if(rope){
+                gX *= distance - pDistance;
+                gY *= distance - pDistance;
+                velX -= gX;
+                velY -= gY;
+            } else {
+                gX *= -10 * (distance - pDistance);
+                gY *= -10 * (distance - pDistance);
+                applyForce(gX, gY);
+            }
         }
         
         pDistance = distance;
@@ -171,17 +185,29 @@ void Player::grapple(Object:: Point b, std::vector<Object::Tile> tileGrid, Objec
         if(b.x > c.x && b.x < SCREEN_WIDTH + c.x && b.y < SCREEN_HEIGHT + c.y && b.y > c.y){
             grappleHead.x = x;
             grappleHead.y = y;
-            hookState = 1;
             target = tiles.checkLineCollision(tileGrid, grappleHead, b);
             selectedHookHolder = selectedHook;
             gX = grappleHead.x - target.x;
             gY = grappleHead.y - target.y;
             distance = sqrt(pow(gX, 2) + pow(gY, 2));
+            if(distance > grapplerange){
+                gX /= distance;
+                gY /= distance;
+                gX *= grapplerange;
+                gY *= grapplerange;
+                target.x = x - gX;
+                target.y = y - gY;
+                target.type = "N/A";
+                gX = grappleHead.x - target.x;
+                gY = grappleHead.y - target.y;
+                distance = grapplerange;
+            }
             grappleSpeed = distance / 6;
             gX /= distance;
             gY /= distance;
             gX *= grappleSpeed;
             gY *= grappleSpeed;
+            hookState = 1;
         }
     } else if (hookState != 3) {
         hookState = 0;
@@ -200,7 +226,7 @@ void Player::changeHooks(std::vector<Object:: Point> b , int change, Object::Cam
                 if (change == -1) {
                     for(int i = 0; i < b.size(); i++){
                         if(b[i].x > c.x && b[i].x < SCREEN_WIDTH + c.x && b[i].y < SCREEN_HEIGHT + c.y && b[i].y > c.y){
-                            if(abs(b[i].x) < difference){
+                            if(abs(b[i].x - c.x) < difference){
                                 difference = abs(b[i].x);
                                 index = i;
                             }
@@ -209,7 +235,7 @@ void Player::changeHooks(std::vector<Object:: Point> b , int change, Object::Cam
                 } else {
                     for(int i = 0; i < b.size(); i++){
                         if(b[i].x > c.x && b[i].x < SCREEN_WIDTH + c.x && b[i].y < SCREEN_HEIGHT + c.y && b[i].y > c.y){
-                            if(abs(SCREEN_WIDTH - b[i].x) < difference){
+                            if(abs(SCREEN_WIDTH - (b[i].x - c.x)) < difference){
                                 difference = abs(SCREEN_WIDTH - b[i].x);
                                 index = i;
                             }

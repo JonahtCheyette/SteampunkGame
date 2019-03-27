@@ -33,6 +33,7 @@ static Event event;
 #include "menu.h"
 static Menu menu;
 #include "draw.h"
+#include "Crate.h"
 #include "Level.h"
 static Draw draw;
 #include "Player.h"

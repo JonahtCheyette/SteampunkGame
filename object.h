@@ -19,9 +19,16 @@ class Object {
 
 		struct Point {
 			float x, y;
+            float initX, initY;
+            int moveDir;
+            float limit1, limit2;
+            float moveSpeed;
+            bool moving;
+            bool vertical;
             std::string type;
 			Point();
             Point(float x, float y, std::string type);
+            Point(float x, float y, std::string type, float limit1, float limit2, float moveSpeed, bool vertical);
 		};
     
 		void drawPoint(Point a, Camera b, SDL_Renderer* renderer);

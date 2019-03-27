@@ -78,23 +78,29 @@ int main(int argc, char * args[]) {
             
                 tiles.checkCollision(tiles.loadedLevel, player);
 
+                levels[whichLevel].update(player, camera);
+                for(int i = 0; i < levels[whichLevel].crateList.size(); i++){
+                    tiles.checkCollision(tiles.loadedLevel, levels[whichLevel].crateList[i]);
+                }
+                
                 object.moveCamera(camera, player.x, player.y, levels[whichLevel].width, levels[whichLevel].height);
             } else {
                 Dper.moveCamera(camera, event);
                 if(type == "drag"){
                     Dper.editLevel(camera, tileVector, levels[whichLevel], renderer, event, tiles.loadedLevel);
                 } else {
-                    Dper.editAssets(camera, event, levels[whichLevel], renderer);
+                    Dper.editAssets(camera, event, levels[whichLevel], renderer, black, Sans);
                 }
                 Dper.createSwitch(event, black, Sans, renderer);
                 Dper.typeSwitch(event, type, black, Sans, renderer, draw);
                 Dper.switchTile(event, tileVector, type, black, Sans, renderer);
+                Dper.changeHookMoveSpeed(event, levels[whichLevel].hookList, black, Sans, renderer, levels[whichLevel].path);
             }
             
             levels[whichLevel].background.drawBackground(renderer, camera, levels[whichLevel].overlap);
             
             object.drawHooks(levels[whichLevel].hookList, camera, player.selectedHook, renderer);
-            
+            levels[whichLevel].draw(renderer, camera);
             if(!dMode){
                 player.draw(camera, renderer);
             }
@@ -105,7 +111,7 @@ int main(int argc, char * args[]) {
             
             if(dMode) {
                 Dper.showEditing(draw, type, black, Sans, tileVector, renderer);
-                Dper.renderDRect(renderer, type, event, levels[whichLevel]);
+                Dper.renderDRect(renderer, type, event, levels[whichLevel], camera);
             }
             
             if(player.hookState == 2) SDL_RenderDrawLine(renderer, player.x - camera.x, player.y - camera.y, player.target.x - camera.x, player.target.y - camera.y);

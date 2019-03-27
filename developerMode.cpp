@@ -205,8 +205,8 @@ void developer::showEditing(Draw draw, std::string type, SDL_Color color, TTF_Fo
     }
 }
 
-void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* renderer){
-    if(hooks){
+void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* renderer, SDL_Color color, TTF_Font* font){
+    if(whichAsset == 0){
         if(e.mouse1){
             if(create){
                 //makes a new hook, puts it into the vector
@@ -224,9 +224,17 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
             std::ofstream hFile(l.path + "hooks.txt", std::ofstream::out | std::ofstream::trunc);
             for(int i = 0; i < l.hookList.size(); i++){
                 std::string s = "";
-                s += std::to_string((int)l.hookList[i].x);
+                s += std::to_string((int) l.hookList[i].initX);
                 s += " ";
-                s += std::to_string((int)l.hookList[i].y);
+                s += std::to_string((int) l.hookList[i].initY);
+                s += " ";
+                s += std::to_string((int) l.hookList[i].limit1);
+                s += " ";
+                s += std::to_string((int) l.hookList[i].limit2);
+                s += " ";
+                s += std::to_string((int) l.hookList[i].moveSpeed);
+                s += " ";
+                s += std::to_string(l.hookList[i].vertical);
                 if(i != l.hookList.size() + 1){
                     s += "\n";
                 }
@@ -234,7 +242,7 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
             }
             hFile.close();
         }
-    } else {
+    } else if (whichAsset == 1) {
         //click to pick up, click to put down
         if(e.mouse1 && clickstate == 0){
             if(sqrt(pow(l.end.x - e.mouseX,2) + pow(l.end.y - e.mouseY,2)) <= 30){
@@ -245,17 +253,138 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
             clickstate = 1;
         } else if(e.mouse1 && clickstate == 1){
             if(spawn){
-                l.spawn.x = e.mouseX;
-                l.spawn.y = e.mouseY;
+                l.spawn.x = e.mouseX + c.x;
+                l.spawn.y = e.mouseY + c.y;
             } else {
-                l.end.x = e.mouseX;
-                l.end.y = e.mouseY;
+                l.end.x = e.mouseX + c.x;
+                l.end.y = e.mouseY + c.y;
             }
+            std::cout << l.end.x;
             std::ofstream seFile(l.path + "start-end.txt", std::ofstream::out | std::ofstream::trunc);
             seFile << l.spawn.x << " " << l.spawn.y << "\n";
             seFile << l.end.x << " " << l.end.y << "\n";
             seFile.close();
             clickstate = 0;
+        }
+    } else if(whichAsset == 2 || whichAsset == 3){
+        if(e.mouse1 && whichHook == -1 && clickstate == 0){
+            for(int i = (int) (l.hookList.size()) - 1; i >= 0; i--){
+                if(sqrt(pow(l.hookList[i].x - (e.mouseX + c.x),2) + pow(l.hookList[i].y - (e.mouseY + c.y),2)) <= 30 && whichHook == -1 && l.hookList[i].moving){
+                    whichHook = i;
+                    clickstate = 1;
+                    moveSpeedTexture = draw.loadFromRenderedText(std::to_string((int) l.hookList[i].moveSpeed), color, font, msW, msH, renderer);
+                }
+            }
+            if(create){
+                if(whichHook == -1){
+                //makes a new hook, puts it into the vector
+                    Object::Point newPoint (e.mouseX + c.x, e.mouseY + c.y, "hook");
+                    newPoint.moving = true;
+                    newPoint.moveSpeed = 2;
+                    if(whichAsset == 2){
+                        newPoint.limit1 = e.mouseX + c.x + 1;
+                        newPoint.limit2 = e.mouseX + c.x - 1;
+                        newPoint.vertical = false;
+                    } else {
+                        newPoint.limit1 = e.mouseY + c.y + 1;
+                        newPoint.limit2 = e.mouseY + c.y - 1;
+                        newPoint.vertical = true;
+                    }
+                    l.hookList.push_back(newPoint);
+                }
+            } else {
+                //deletes all hooks within 30 px of mouseclick
+                for(int i = (int) (l.hookList.size()) - 1; i >= 0; i--){
+                    if(sqrt(pow(l.hookList[i].x - (e.mouseX + c.x),2) + pow(l.hookList[i].y - (e.mouseY + c.y),2)) <= 30){
+                        l.hookList.erase(l.hookList.begin() + i);
+                    }
+                }
+            }
+            //save to file
+            std::ofstream hFile(l.path + "hooks.txt", std::ofstream::out | std::ofstream::trunc);
+            for(int i = 0; i < l.hookList.size(); i++){
+                std::string s = "";
+                s += std::to_string((int) l.hookList[i].initX);
+                s += " ";
+                s += std::to_string((int) l.hookList[i].initY);
+                s += " ";
+                s += std::to_string((int) l.hookList[i].limit1);
+                s += " ";
+                s += std::to_string((int) l.hookList[i].limit2);
+                s += " ";
+                s += std::to_string((int) l.hookList[i].moveSpeed);
+                s += " ";
+                s += std::to_string(l.hookList[i].vertical);
+                if(i != l.hookList.size() + 1){
+                    s += "\n";
+                }
+                hFile << s;
+            }
+            hFile.close();
+        } else if(clickstate == 1 && whichHook != -1 && e.mouse1){
+            if(l.hookList[whichHook].vertical){
+                if(abs((e.mouseX + c.x) - l.hookList[whichHook].x) <= 30 && abs((e.mouseY + c.y) - l.hookList[whichHook].limit1) <= 30){
+                    whichLimit = 1;
+                    clickstate = 2;
+                } else if (abs((e.mouseX + c.x) - l.hookList[whichHook].x) <= 30 && abs((e.mouseY + c.y) - l.hookList[whichHook].limit2) <= 30){
+                    whichLimit = 2;
+                    clickstate = 2;
+                }
+            } else {
+                if(abs((e.mouseX + c.x) - l.hookList[whichHook].limit1) <= 30 && abs((e.mouseY + c.y) - l.hookList[whichHook].y) <= 30){
+                    whichLimit = 1;
+                    clickstate = 2;
+                } else if(abs((e.mouseX + c.x) - l.hookList[whichHook].limit2) <= 30 && abs((e.mouseY + c.y) - l.hookList[whichHook].y) <= 30){
+                    whichLimit = 2;
+                    clickstate = 2;
+                }
+            }
+        } else if(clickstate == 2 && whichHook != -1 && e.mouse1){
+            if(l.hookList[whichHook].vertical){
+                if(whichLimit == 1){
+                    l.hookList[whichHook].limit1 = e.mouseY + c.y;
+                } else {
+                    l.hookList[whichHook].limit2 = e.mouseY + c.y;
+                }
+                if(l.hookList[whichHook].limit1 < l.hookList[whichHook].y){
+                    l.hookList[whichHook].limit1 = l.hookList[whichHook].y;
+                } else if (l.hookList[whichHook].limit2 > l.hookList[whichHook].y){
+                    l.hookList[whichHook].limit2 = l.hookList[whichHook].y;
+                }
+            } else {
+                if(whichLimit == 1){
+                    l.hookList[whichHook].limit1 = e.mouseX + c.x;
+                } else {
+                    l.hookList[whichHook].limit2 = e.mouseX + c.x;
+                }
+                if(l.hookList[whichHook].limit1 < l.hookList[whichHook].x){
+                    l.hookList[whichHook].limit1 = l.hookList[whichHook].x;
+                } else if (l.hookList[whichHook].limit2 > l.hookList[whichHook].x){
+                    l.hookList[whichHook].limit2 = l.hookList[whichHook].x;
+                }
+            }
+            std::ofstream hFile(l.path + "hooks.txt", std::ofstream::out | std::ofstream::trunc);
+            for(int i = 0; i < l.hookList.size(); i++){
+                std::string s = "";
+                s += std::to_string((int) l.hookList[i].initX);
+                s += " ";
+                s += std::to_string((int) l.hookList[i].initY);
+                s += " ";
+                s += std::to_string((int) l.hookList[i].limit1);
+                s += " ";
+                s += std::to_string((int) l.hookList[i].limit2);
+                s += " ";
+                s += std::to_string((int) l.hookList[i].moveSpeed);
+                s += " ";
+                s += std::to_string(l.hookList[i].vertical);
+                if(i != l.hookList.size() + 1){
+                    s += "\n";
+                }
+                hFile << s;
+            }
+            hFile.close();
+            clickstate = 0;
+            whichHook = -1;
         }
     }
 }
@@ -282,15 +411,16 @@ void developer::typeSwitch(Event e, std::string &type, SDL_Color color, TTF_Font
             type = "click";
             clickstate = 0;
             held = false;
-            if(hooks){
+            if(whichAsset == 0){
                 whichTexture = draw.loadFromRenderedText("hooks", color, font, whichW, whichH, renderer);
-            } else {
+            } else if (whichAsset == 1) {
                 whichTexture = draw.loadFromRenderedText("spawn/end points", color, font, whichW, whichH, renderer);
             }
             typeTexture = draw.loadFromRenderedText("click", color, font, typeW, typeH, renderer);
         } else {
             type = "drag";
             typeTexture = draw.loadFromRenderedText("drag", color, font, typeW, typeH, renderer);
+            clickstate = 0;
         }
         clicked2 = true;
     } else if (!e.keyboard_state_array[SDL_SCANCODE_E]){
@@ -314,7 +444,7 @@ void developer::switchTile(Event e, std::vector<Object::tileHolder> tileVector, 
         } else if (!e.keyboard_state_array[SDL_SCANCODE_F]){
             clicked4 = false;
         }
-        if(whichTile > (tileVector.size() - 1)){
+        if(whichTile > (int) (tileVector.size() - 1)){
             whichTile = 0;
         } else if(whichTile < 0){
             whichTile = (int) (tileVector.size() - 1);
@@ -339,18 +469,34 @@ void developer::switchTile(Event e, std::vector<Object::tileHolder> tileVector, 
         }
     } else {
         //other assets
-        if((e.keyboard_state_array[SDL_SCANCODE_R] || e.keyboard_state_array[SDL_SCANCODE_F]) && ! clicked3){
-            hooks = !hooks;
+        if(e.keyboard_state_array[SDL_SCANCODE_R] && !clicked3){
+            whichAsset ++;
             clickstate = 0;
-            if(hooks){
-                whichTexture = draw.loadFromRenderedText("hooks", color, font, whichW, whichH, renderer);
-            } else {
-                whichTexture = draw.loadFromRenderedText("spawn/end points", color, font, whichW, whichH, renderer);
-            }
             clicked3 = true;
-        }
-        if (!e.keyboard_state_array[SDL_SCANCODE_R] && !e.keyboard_state_array[SDL_SCANCODE_F]){
+        } else if (!e.keyboard_state_array[SDL_SCANCODE_R]){
             clicked3 = false;
+        }
+        if (e.keyboard_state_array[SDL_SCANCODE_F] && ! clicked4){
+            whichAsset --;
+            clickstate = 0;
+            clicked4 = true;
+        } else if (!e.keyboard_state_array[SDL_SCANCODE_F]){
+            clicked4 = false;
+        }
+        if(whichAsset < 0){
+            whichAsset = 2;
+        }
+        if(whichAsset > 3){
+            whichAsset = 0;
+        }
+        if(whichAsset == 0){
+            whichTexture = draw.loadFromRenderedText("hooks", color, font, whichW, whichH, renderer);
+        } else if (whichAsset == 1) {
+            whichTexture = draw.loadFromRenderedText("spawn/end points", color, font, whichW, whichH, renderer);
+        } else if (whichAsset == 2){
+            whichTexture = draw.loadFromRenderedText("moving hooks (horizontal)", color, font, whichW, whichH, renderer);
+        } else if (whichAsset == 3){
+            whichTexture = draw.loadFromRenderedText("moving hooks (vertical)", color, font, whichW, whichH, renderer);
         }
     }
 }
@@ -361,6 +507,7 @@ void developer::init(Draw draw, SDL_Color color, TTF_Font* font, SDL_Renderer* r
     y = 0;
     w = 0;
     h = 0;
+    whichHook = -1;
     held = false;
     moveSpeed = 5;
     create = true;
@@ -368,26 +515,109 @@ void developer::init(Draw draw, SDL_Color color, TTF_Font* font, SDL_Renderer* r
     clicked2 = false;
     clicked3 = false;
     clicked4 = false;
-    hooks = false;
+    clicked5 = false;
+    clicked6 = false;
     spawn = false;
     whichTile = 0;
-    destination.x = 0;
+    whichAsset = 0;
     typeTexture = draw.loadFromRenderedText("drag", color, font, typeW, typeH, renderer);
     createTexture = draw.loadFromRenderedText("create", color, font, createW, createH, renderer);
     whichTexture = draw.loadFromRenderedText("test1", color, font, whichW, whichH, renderer);
+    moveSpeedTexture = draw.loadFromRenderedText("0", color, font, msW, msH, renderer);
 }
 
-void developer::renderDRect(SDL_Renderer* renderer, std::string type, Event e, Level l){
+void developer::renderDRect(SDL_Renderer* renderer, std::string type, Event e, Level l, Object::Camera c){
     //renders rect while being dragged
     if(clickstate == 1){
         if(type == "drag"){
             SDL_RenderDrawRect(renderer, &heldRect);
-        } else if (!hooks){
+        } else if (whichAsset == 1){
             heldRect.w = TILE_WIDTH;
             heldRect.h = TILE_HEIGHT;
             heldRect.x = e.mouseX - TILE_WIDTH / 2;
             heldRect.y = e.mouseY - TILE_HEIGHT / 2;
             SDL_RenderCopy(renderer, l.Start_End, nullptr, &heldRect);
+        }
+    }
+    if ((whichAsset == 2 || whichAsset == 3) && whichHook != -1){
+        heldRect.w = 8;
+        heldRect.h = 8;
+        if(l.hookList[whichHook].vertical){
+            heldRect.x = l.hookList[whichHook].x - 4 - c.x;
+            heldRect.y = l.hookList[whichHook].limit1 - 4 - c.y;
+            SDL_RenderDrawRect(renderer, &heldRect);
+            heldRect.y = l.hookList[whichHook].limit2 - 4 - c.y;
+            SDL_RenderDrawRect(renderer, &heldRect);
+        } else {
+            heldRect.y = l.hookList[whichHook].y - 4 - c.y;
+            heldRect.x = l.hookList[whichHook].limit1 - 4 - c.x;
+            SDL_RenderDrawRect(renderer, &heldRect);
+            heldRect.x = l.hookList[whichHook].limit2 - 4 - c.x;
+            SDL_RenderDrawRect(renderer, &heldRect);
+        }
+        heldRect.x = l.hookList[whichHook].x - (msW /2);
+        heldRect.y = l.hookList[whichHook].y - (msH/2) - 40;
+        heldRect.w = msW;
+        heldRect.h = msH;
+        SDL_RenderCopy(renderer, moveSpeedTexture, nullptr, &heldRect);
+    }
+}
+
+void developer::changeHookMoveSpeed(Event e, std::vector<Object::Point> &hooks, SDL_Color color, TTF_Font *font, SDL_Renderer *renderer, std::string path){
+    if ((whichAsset == 2 || whichAsset == 3) && whichHook != -1){
+        if(e.keyboard_state_array[SDL_SCANCODE_UP] && !clicked5){
+            hooks[whichHook].moveSpeed++;
+            moveSpeedTexture = draw.loadFromRenderedText(std::to_string((int) hooks[whichHook].moveSpeed), color, font, msW, msH, renderer);
+            std::ofstream hFile(path + "hooks.txt", std::ofstream::out | std::ofstream::trunc);
+            for(int i = 0; i < hooks.size(); i++){
+                std::string s = "";
+                s += std::to_string((int) hooks[i].initX);
+                s += " ";
+                s += std::to_string((int) hooks[i].initY);
+                s += " ";
+                s += std::to_string((int) hooks[i].limit1);
+                s += " ";
+                s += std::to_string((int) hooks[i].limit2);
+                s += " ";
+                s += std::to_string((int) hooks[i].moveSpeed);
+                s += " ";
+                s += std::to_string(hooks[i].vertical);
+                if(i != hooks.size() + 1){
+                    s += "\n";
+                }
+                hFile << s;
+            }
+            hFile.close();
+            clicked6 = true;
+        } else if (!e.keyboard_state_array[SDL_SCANCODE_UP]){
+            clicked5 = false;
+        }
+        if(e.keyboard_state_array[SDL_SCANCODE_DOWN] && !clicked6){
+            hooks[whichHook].moveSpeed--;
+            moveSpeedTexture = draw.loadFromRenderedText(std::to_string((int) hooks[whichHook].moveSpeed), color, font, msW, msH, renderer);
+            std::ofstream hFile(path + "hooks.txt", std::ofstream::out | std::ofstream::trunc);
+            for(int i = 0; i < hooks.size(); i++){
+                std::string s = "";
+                s += std::to_string((int) hooks[i].initX);
+                s += " ";
+                s += std::to_string((int) hooks[i].initY);
+                s += " ";
+                s += std::to_string((int) hooks[i].limit1);
+                s += " ";
+                s += std::to_string((int) hooks[i].limit2);
+                s += " ";
+                s += std::to_string((int) hooks[i].moveSpeed);
+                s += " ";
+                s += std::to_string(hooks[i].vertical);
+                if(i != hooks.size() + 1){
+                    s += "\n";
+                }
+                hFile << s;
+            }
+            hFile.close();
+            clicked6 = true;
+        } else if (!e.keyboard_state_array[SDL_SCANCODE_DOWN]){
+            clicked6 = false;
         }
     }
 }
