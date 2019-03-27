@@ -8,8 +8,9 @@ public:
     
     //Level level;
     struct dirent *de;
-    int a;
-    float b, c;
+    float a;
+    int tileNum;
+    bool bo, bi;
     std::string fName;
     std::string iPath;
     DIR *dr;

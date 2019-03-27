@@ -11,7 +11,7 @@ public:
     void typeSwitch(Event e, std::string &type, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer, Draw draw);
     void switchTile(Event e, std::vector<Object::tileHolder> tileVector, std::string type, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer);
     void init(Draw draw, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer);
-    void renderDRect(SDL_Renderer* renderer, std::string type);
+    void renderDRect(SDL_Renderer* renderer, std::string type, Event e, Level l);
     
     //rect for the tile editing rectangle
     SDL_Rect heldRect;

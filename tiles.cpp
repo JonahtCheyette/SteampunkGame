@@ -14,28 +14,28 @@ void Tiles::mapInit(Level level, std::vector<Object::tileHolder> t) {
                         if(y == 0){
                             above = true;
                         } else {
-                            if(level.tileGrid[y - 1][x] < t[i].tileNum + 1 && level.tileGrid[y - 1][x] >= t[i].tileNum){
+                            if(level.tileGrid[y - 1][x] == t[i].tileNum){
                                 above = true;
                             }
                         }
                         if(y == level.tileGrid.size() - 1){
                             below = true;
                         } else {
-                            if(level.tileGrid[y + 1][x] < t[i].tileNum + 1 && level.tileGrid[y + 1][x] >= t[i].tileNum){
+                            if(level.tileGrid[y + 1][x] == t[i].tileNum){
                                 below = true;
                             }
                         }
                         if(x == 0){
                             toTheLeft = true;
                         } else {
-                            if(level.tileGrid[y][x - 1] < t[i].tileNum + 1 && level.tileGrid[y][x - 1] >= t[i].tileNum){
+                            if(level.tileGrid[y][x - 1] == t[i].tileNum){
                                 toTheLeft = true;
                             }
                         }
                         if(x == level.tileGrid[0].size() - 1){
                             toTheRight = true;
                         } else {
-                            if(level.tileGrid[y][x + 1] < t[i].tileNum + 1 && level.tileGrid[y][x + 1] >= t[i].tileNum){
+                            if(level.tileGrid[y][x + 1] == t[i].tileNum){
                                 toTheRight = true;
                             }
                         }
@@ -121,6 +121,26 @@ void Tiles::mapInit(Level level, std::vector<Object::tileHolder> t) {
                             } else {
                                 tile.texture = t[i].passThroughBoth;
                             }
+                        } else if (t[i].kind == 2){
+                            tile.clockWise = t[i].clockWise;
+                            tile.vertical = t[i].vertical;
+                            if(t[i].vertical){
+                                if(above && below){
+                                    tile.texture = t[i].middle;
+                                } else if (above){
+                                    tile.texture = t[i].end1;
+                                } else {
+                                    tile.texture = t[i].end2;
+                                }
+                            } else {
+                                if(toTheRight && toTheLeft){
+                                    tile.texture = t[i].middle;
+                                } else if (toTheRight){
+                                    tile.texture = t[i].end1;
+                                } else {
+                                    tile.texture = t[i].end2;
+                                }
+                            }
                         }
                         loadedLevel.push_back(tile);
                     }
@@ -131,22 +151,19 @@ void Tiles::mapInit(Level level, std::vector<Object::tileHolder> t) {
 }
 
 void Tiles::drawTiles(std::vector<Object::Tile> tileGrid, Object::Camera camera, SDL_Renderer* renderer, std::vector<Object::tileHolder> t) {
-	SDL_Rect destination;
-	destination.w = TILE_WIDTH;
-	destination.h = TILE_HEIGHT;
+    SDL_Rect destination;
+    destination.w = TILE_WIDTH;
+    destination.h = TILE_HEIGHT;
 	for (int i = 0; i < tileGrid.size(); i++) {
         if (tileGrid[i].y + tileGrid[i].h > camera.y && tileGrid[i].y < camera.y + SCREEN_HEIGHT && tileGrid[i].x + tileGrid[i].w > camera.x && tileGrid[i].x < camera.x + SCREEN_WIDTH){
-            SDL_Rect destination;
             destination.x = tileGrid[i].x - camera.x;
             destination.y = tileGrid[i].y - camera.y;
-            destination.w = tileGrid[i].w;
-            destination.h = tileGrid[i].h;
             SDL_RenderCopy(renderer, tileGrid[i].texture, nullptr, &destination);
         }
 	}
 }
 
-void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Player &a, std::vector<Object::tileHolder> t) {
+void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Player &a) {
     colOverlap = 0;
     xOverlap = 0;
     yOverlap = 0;
@@ -159,7 +176,7 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Player &a, std::v
     for (int i = 0; i < tileGrid.size(); i++) {
         lEdge = tileGrid[i].x;
         rEdge = lEdge + tileGrid[i].w;
-        if(tileGrid[i].kind == 0){
+        if(tileGrid[i].kind == 0 || tileGrid[i].kind == 2){
             tEdge = tileGrid[i].y;
             bEdge = tEdge + tileGrid[i].h;
         } else {
@@ -208,7 +225,7 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Player &a, std::v
         if(overallOverlap[i] > 0){
             lEdge = tileGrid[intercepts[i]].x;
             rEdge = lEdge + tileGrid[intercepts[i]].w;
-            if(tileGrid[intercepts[i]].kind == 0){
+            if(tileGrid[intercepts[i]].kind == 0 || tileGrid[intercepts[i]].kind == 2){
                 tEdge = tileGrid[intercepts[i]].y;
                 bEdge = tEdge + tileGrid[intercepts[i]].h;
             } else {
@@ -216,23 +233,59 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, Player &a, std::v
                 bEdge = tileGrid[intercepts[i]].y + tileGrid[intercepts[i]].h;
             }
             if (a.x + a.hitbox.width / 2 > lEdge && a.x - a.hitbox.width / 2 < rEdge && a.y +  a.hitbox.height / 2 > tEdge && a.y - a.hitbox.height / 2 < bEdge) {
-                if(tileGrid[intercepts[i]].kind == 0){
+                if(tileGrid[intercepts[i]].kind == 0 || tileGrid[intercepts[i]].kind == 2){
                     a.friction = tileGrid[intercepts[i]].f;
                     if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY)) {
                         a.y = tEdge - a.hitbox.height / 2;
                         if(a.velY >= 0){
                             a.velY = 0;
                             a.airborne = false;
+                            if(tileGrid[intercepts[i]].kind == 2){
+                                if(!tileGrid[intercepts[i]].vertical){
+                                    if(tileGrid[intercepts[i]].clockWise){
+                                        a.applyForce(20, 0);
+                                    } else {
+                                        a.applyForce(-20, 0);
+                                    }
+                                }
+                            }
                         }
                     } else if ((a.y - a.hitbox.height / 2) >= (bEdge + a.velY)){
                         a.y = bEdge + a.hitbox.height / 2;
                         a.velY = 0;
+                        if(tileGrid[intercepts[i]].kind == 2){
+                            if(!tileGrid[intercepts[i]].vertical){
+                                if(tileGrid[intercepts[i]].clockWise){
+                                    a.applyForce(-20, 0);
+                                } else {
+                                    a.applyForce(20, 0);
+                                }
+                            }
+                        }
                     } else if ((a.x - a.hitbox.width / 2) >= (rEdge + a.velX - 0.01)){
                         a.x = rEdge + a.hitbox.width / 2;
                         a.velX = 0;
+                        if(tileGrid[intercepts[i]].kind == 2){
+                            if(tileGrid[intercepts[i]].vertical){
+                                if(tileGrid[intercepts[i]].clockWise){
+                                    a.applyForce(0, 20);
+                                } else {
+                                    a.applyForce(0, -20);
+                                }
+                            }
+                        }
                     } else {
                         a.x = lEdge - a.hitbox.width / 2;
                         a.velX = 0;
+                        if(tileGrid[intercepts[i]].kind == 2){
+                            if(tileGrid[intercepts[i]].vertical){
+                                if(tileGrid[intercepts[i]].clockWise){
+                                    a.applyForce(0, -20);
+                                } else {
+                                    a.applyForce(0, 20);
+                                }
+                            }
+                        }
                     }
                 } else {
                     if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY)) {
@@ -262,7 +315,7 @@ Object::Point Tiles::checkLineCollision(std::vector<Object::Tile> tileGrid, Obje
         //x = y - b /m
         lEdge = tileGrid[i].x;
         rEdge = lEdge + tileGrid[i].w;
-        if(tileGrid[i].kind == 0){
+        if(tileGrid[i].kind == 0 || tileGrid[i].kind == 2){
             tEdge = tileGrid[i].y;
             bEdge = tEdge + tileGrid[i].h;
         } else {

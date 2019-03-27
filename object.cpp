@@ -68,12 +68,14 @@ Object::Tile::Tile(int x, int y, float f, int kind){
     this -> f = f;
 }
 
-Object::tileHolder::tileHolder(int kind, float tileNum, float friction, std::string path, std::string Dpath, SDL_Renderer* renderer){
+Object::tileHolder::tileHolder(int kind, int tileNum, float friction, std::string path, std::string Dpath, SDL_Renderer* renderer, bool clockWise, bool vertical){
     this -> kind = kind;
     this -> tileNum = tileNum;
     this -> path = path;
     this -> Dpath = Dpath;
     this -> friction = friction;
+    this -> clockWise = clockWise;
+    this -> vertical = vertical;
     if(kind == 0){
         topLeft = draw.loadTexture(path + "topLeft.png", renderer);
         top = draw.loadTexture(path + "top.png", renderer);
@@ -91,11 +93,15 @@ Object::tileHolder::tileHolder(int kind, float tileNum, float friction, std::str
         single = draw.loadTexture(path + "single.png", renderer);
         wall = draw.loadTexture(path + "wall.png", renderer);
         ceiling = draw.loadTexture(path + "ceiling.png", renderer);
-    } else {
+    } else if(kind == 1){
         passThrough = draw.loadTexture(path + "passThrough.png", renderer);
         passThroughLeft = draw.loadTexture(path + "passThroughLeft.png", renderer);
         passThroughRight = draw.loadTexture(path + "passThroughRight.png", renderer);
         passThroughBoth = draw.loadTexture(path + "passThroughBoth.png", renderer);
+    } else {
+        middle = draw.loadTexture(path + "middle.png", renderer);
+        end1 = draw.loadTexture(path + "end1.png", renderer);
+        end2 = draw.loadTexture(path + "end2.png", renderer);
     }
 }
 

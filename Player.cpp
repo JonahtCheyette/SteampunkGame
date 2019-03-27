@@ -9,9 +9,9 @@ Player::Player(SDL_Renderer* renderer, Draw draw){
     accelY = Gravity;
     mass = 20;
     
-    hitbox.height = 48;
-    hitbox.width = 24;
-    
+    hitbox.height = 96;
+    hitbox.width = 48;
+
     maxXSpeed = 10;
     maxYSpeed = 10;
     acceleration = 5;
@@ -49,6 +49,7 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
         if (event.keyboard_state_array[SDL_SCANCODE_UP] && sqrt(pow(l.end.x - x,2) + pow(l.end.y - y,2)) < 20){
             which ++;
             if(which == maxLevel){
+                std::cout<<"YOU WIN!"<<std::endl;
                 which = maxLevel - 1;
             }
         }
@@ -76,9 +77,10 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
     if (velX < -maxXSpeed) velX = -maxXSpeed;
     if(abs(velX) < 0.001) velX = 0;
 
-    
-    if (velY > maxYSpeed) velY = maxYSpeed;
-    if (velY < -maxYSpeed) velY = -maxYSpeed;
+    if(hookState == 2){
+        if (velY > maxYSpeed) velY = maxYSpeed;
+        if (velY < -maxYSpeed) velY = -maxYSpeed;
+    }
     
     hitbox.x = x;
     hitbox.y = y;
@@ -99,6 +101,8 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
     if(hitbox.y - hitbox.height/2 > l.height){
         y = l.spawn.y;
         x = l.spawn.x;
+        velX = 0;
+        velY = 0;
     }
     //making it so that the hook doesn't change every frame you hold down  arrow
     if(changedHook && !(event.keyboard_state_array[SDL_SCANCODE_LEFT] || event.keyboard_state_array[SDL_SCANCODE_RIGHT])){
@@ -106,7 +110,7 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
     }
 }
 
-void Player::moveHook() {
+void Player::moveHook(std::vector<Object::Point> a) {
     if(hookState == 3){
         gX = grappleHead.x - x;
         gY = grappleHead.y - y;
@@ -134,6 +138,8 @@ void Player::moveHook() {
             }
         }
     } else if (hookState == 2){
+        target.x = a[selectedHookHolder].x;
+        target.y = a[selectedHookHolder].y;
         gX = x - target.x;
         gY = y - target.y;
         distance = sqrt(pow(gX, 2) + pow(gY, 2));
@@ -167,6 +173,7 @@ void Player::grapple(Object:: Point b, std::vector<Object::Tile> tileGrid, Objec
             grappleHead.y = y;
             hookState = 1;
             target = tiles.checkLineCollision(tileGrid, grappleHead, b);
+            selectedHookHolder = selectedHook;
             gX = grappleHead.x - target.x;
             gY = grappleHead.y - target.y;
             distance = sqrt(pow(gX, 2) + pow(gY, 2));

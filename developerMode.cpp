@@ -75,22 +75,26 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
                         Object::Tile t(tx, ty, tileVector[whichTile].friction, tileVector[whichTile].kind);
                         if(tileVector[whichTile].kind == 0){
                             t.texture = tileVector[whichTile].single;
-                        } else {
+                        } else if(tileVector[whichTile].kind == 1) {
                             t.texture = tileVector[whichTile].passThroughBoth;
+                        } else {
+                            t.texture = tileVector[whichTile].middle;
+                            t.clockWise = tileVector[whichTile].clockWise;
+                            t.vertical = tileVector[whichTile].vertical;
                         }
                         tileGrid.push_back(t);
                     }
                 }
             }
             //opening the map file
-            std::vector<std::vector<float>> grid;
+            std::vector<std::vector<int>> grid;
             std::string line;
             std::ifstream mapFile(level.path + "tiles.txt");
             while(std::getline(mapFile, line)){
-                std::vector <float> row;
+                std::vector <int> row;
                 for(int j = 0; j < line.length(); j++){
                     if(!isspace(line[j])){
-                        row.push_back((float) line[j] - 48);
+                        row.push_back((int) line[j] - 48);
                     }
                 }
                 if(row.size() != 0){
@@ -100,7 +104,7 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
             mapFile.close();
             //resizing the grid in case the edited section is outside of it
             while(grid.size() < fy) {
-                std::vector<float> row;
+                std::vector<int> row;
                 for(int j = 0; j < grid[0].size(); j++){
                     row.push_back(0);
                 }
@@ -169,7 +173,7 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
                     if(j > 0){
                         l += " ";
                     }
-                    l += std::to_string((int) grid[i][j]);
+                    l += std::to_string(grid[i][j]);
                 }
                 if(i != grid.size() - 1){
                     l += "\n";
@@ -231,27 +235,28 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
             hFile.close();
         }
     } else {
-        //WIP
+        //click to pick up, click to put down
         if(e.mouse1 && clickstate == 0){
             if(sqrt(pow(l.end.x - e.mouseX,2) + pow(l.end.y - e.mouseY,2)) <= 30){
                 spawn = false;
-                clickstate = 1;
             } else if (sqrt(pow(l.spawn.x - e.mouseX,2) + pow(l.spawn.y - e.mouseY,2)) <= 30) {
                 spawn = true;
-                clickstate = 1;
             }
+            clickstate = 1;
+        } else if(e.mouse1 && clickstate == 1){
+            if(spawn){
+                l.spawn.x = e.mouseX;
+                l.spawn.y = e.mouseY;
+            } else {
+                l.end.x = e.mouseX;
+                l.end.y = e.mouseY;
+            }
+            std::ofstream seFile(l.path + "start-end.txt", std::ofstream::out | std::ofstream::trunc);
+            seFile << l.spawn.x << " " << l.spawn.y << "\n";
+            seFile << l.end.x << " " << l.end.y << "\n";
+            seFile.close();
+            clickstate = 0;
         }
-        if(event.mouse1held && clickstate == 1){
-            heldRect.x = e.mouseX - TILE_WIDTH / 2;
-            heldRect.y = e.mouseY - TILE_HEIGHT / 2;
-            heldRect.w = TILE_WIDTH;
-            heldRect.h = TILE_HEIGHT;
-            SDL_RenderCopy(renderer, l.Start_End, nullptr, &heldRect);
-        }
-        if(held && !event.mouse1held){
-            clickstate = 2;
-        }
-        held = event.mouse1held;
     }
 }
 
@@ -314,11 +319,29 @@ void developer::switchTile(Event e, std::vector<Object::tileHolder> tileVector, 
         } else if(whichTile < 0){
             whichTile = (int) (tileVector.size() - 1);
         }
-        whichTexture = draw.loadFromRenderedText(tileVector[whichTile].Dpath, color, font, whichW, whichH, renderer);
+        if(tileVector[whichTile].kind == 2){
+            std::string assembleString = tileVector[whichTile].Dpath;
+            assembleString += " ";
+            if(tileVector[whichTile].vertical){
+                assembleString += "vertical";
+            } else {
+                assembleString += "horizontal";
+            }
+            assembleString += " ";
+            if(tileVector[whichTile].clockWise){
+                assembleString += "clockwise";
+            } else {
+                assembleString += "counterclockwise";
+            }
+            whichTexture = draw.loadFromRenderedText(assembleString, color, font, whichW, whichH, renderer);
+        } else {
+            whichTexture = draw.loadFromRenderedText(tileVector[whichTile].Dpath, color, font, whichW, whichH, renderer);
+        }
     } else {
         //other assets
         if((e.keyboard_state_array[SDL_SCANCODE_R] || e.keyboard_state_array[SDL_SCANCODE_F]) && ! clicked3){
             hooks = !hooks;
+            clickstate = 0;
             if(hooks){
                 whichTexture = draw.loadFromRenderedText("hooks", color, font, whichW, whichH, renderer);
             } else {
@@ -354,9 +377,17 @@ void developer::init(Draw draw, SDL_Color color, TTF_Font* font, SDL_Renderer* r
     whichTexture = draw.loadFromRenderedText("test1", color, font, whichW, whichH, renderer);
 }
 
-void developer::renderDRect(SDL_Renderer* renderer, std::string type){
+void developer::renderDRect(SDL_Renderer* renderer, std::string type, Event e, Level l){
     //renders rect while being dragged
-    if(type == "drag" && clickstate == 1){
-        SDL_RenderDrawRect(renderer, &heldRect);
+    if(clickstate == 1){
+        if(type == "drag"){
+            SDL_RenderDrawRect(renderer, &heldRect);
+        } else if (!hooks){
+            heldRect.w = TILE_WIDTH;
+            heldRect.h = TILE_HEIGHT;
+            heldRect.x = e.mouseX - TILE_WIDTH / 2;
+            heldRect.y = e.mouseY - TILE_HEIGHT / 2;
+            SDL_RenderCopy(renderer, l.Start_End, nullptr, &heldRect);
+        }
     }
 }

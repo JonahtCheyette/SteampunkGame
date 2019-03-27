@@ -12,7 +12,7 @@ public:
     int height;
     int width;
     std::string path;
-    std::vector< std::vector <float> > tileGrid;
+    std::vector< std::vector <int> > tileGrid;
     std::vector<Object::Point> hookList;
     SDL_Texture* Start_End;
     Object::Point spawn;

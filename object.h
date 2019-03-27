@@ -45,16 +45,20 @@ class Object {
             int x, y;
             int w, h;
             float f;
+            bool clockWise;
+            bool vertical;
             SDL_Texture* texture;
             Tile (int x, int y, float f, int kind);
         };
     
         struct tileHolder {
             int kind;
-            float tileNum;
+            int tileNum;
             float friction;
             std::string path;
             std::string Dpath;
+            bool clockWise;
+            bool vertical;
             
             //RELEASE THE HOUNDS
             //FOR REGULAR TILES
@@ -81,7 +85,12 @@ class Object {
             SDL_Texture* passThroughRight;
             SDL_Texture* passThroughBoth;
             
-            tileHolder(int kind, float tileNum, float friction, std::string path, std::string Dpath, SDL_Renderer* renderer);
+            //FOR CONVEYORS/ TILES THAT MOVE YOU
+            SDL_Texture* middle;
+            SDL_Texture* end1;
+            SDL_Texture* end2;
+            
+            tileHolder(int kind, int tileNum, float friction, std::string path, std::string Dpath, SDL_Renderer* renderer, bool clockWise = false, bool vertical = false);
         };
     
         struct Layer {

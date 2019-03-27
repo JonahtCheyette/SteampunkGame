@@ -23,7 +23,7 @@ int main(int argc, char * args[]) {
     std::vector<Object::tileHolder> tileVector;
     std::vector<Level> levels;
     
-    loader.loadTiles(tileVector, "Steampunk-Game/tData", renderer);
+    loader.loadTiles(tileVector, "Steampunk-Game/tData/", renderer);
     loader.loadLevels(levels, "Steampunk-Game/Levels", renderer, draw);
     
     bool dMode = true;
@@ -74,9 +74,9 @@ int main(int argc, char * args[]) {
 			}
             if(!dMode){
                 player.move(e, levels[whichLevel], camera, tiles.loadedLevel, whichLevel, (int) (levels.size()));
-                player.moveHook();
+                player.moveHook(levels[whichLevel].hookList);
             
-                tiles.checkCollision(tiles.loadedLevel, player, tileVector);
+                tiles.checkCollision(tiles.loadedLevel, player);
 
                 object.moveCamera(camera, player.x, player.y, levels[whichLevel].width, levels[whichLevel].height);
             } else {
@@ -105,7 +105,7 @@ int main(int argc, char * args[]) {
             
             if(dMode) {
                 Dper.showEditing(draw, type, black, Sans, tileVector, renderer);
-                Dper.renderDRect(renderer, type);
+                Dper.renderDRect(renderer, type, event, levels[whichLevel]);
             }
             
             if(player.hookState == 2) SDL_RenderDrawLine(renderer, player.x - camera.x, player.y - camera.y, player.target.x - camera.x, player.target.y - camera.y);

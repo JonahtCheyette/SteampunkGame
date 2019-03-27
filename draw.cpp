@@ -5,7 +5,7 @@ SDL_Texture* Draw::loadTexture(std::string path, SDL_Renderer* renderer) {
 	//Load image at specified path
 	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
     if(loadedSurface == NULL){
-        std::cout << "Img didn't load at " + path;
+        std::cout << "Img didn't load at " + path << std::endl;
     }
 	//Create texture from surface pixels
 	newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
@@ -52,9 +52,9 @@ SDL_Texture* Draw::loadFromRenderedText(std::string textureText, SDL_Color textC
     return mTexture;
 }
 
-void Draw::render(SDL_Renderer* renderer, int x, int y, SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip) {
+void Draw::render(SDL_Renderer* renderer, int x, int y, int w, int h, SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip) {
 	//set rendering space
-	SDL_Rect renderQuad = { x, y, textureWidth, textureHeight };
+	SDL_Rect renderQuad = {x, y, w, h};
 
 	//Set clip rendering dimensions
 	if (clip != NULL)

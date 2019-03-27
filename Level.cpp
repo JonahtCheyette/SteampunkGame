@@ -13,10 +13,10 @@ Level Level::levelInit(std::string path, SDL_Renderer* renderer, Draw draw){
     std::ifstream hookFile(path + "hooks.txt");
     std::ifstream startend(path + "start-end.txt");
     while(std::getline(mapFile, line)){
-        std::vector <float> row;
+        std::vector <int> row;
         for(int j = 0; j < line.length(); j++){
             if(!isspace(line[j])){
-                row.push_back((float) line[j] - 48);
+                row.push_back((int) line[j] - 48);
             }
         }
         if(row.size() != 0){
