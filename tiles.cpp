@@ -243,9 +243,9 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                             if(tileGrid[intercepts[i]].kind == 2){
                                 if(!tileGrid[intercepts[i]].vertical){
                                     if(tileGrid[intercepts[i]].clockWise){
-                                        a.applyForce(20, 0);
+                                        a.velX += 1;
                                     } else {
-                                        a.applyForce(-20, 0);
+                                        a.velX -= 1;
                                     }
                                 }
                             }
@@ -256,9 +256,9 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                         if(tileGrid[intercepts[i]].kind == 2){
                             if(!tileGrid[intercepts[i]].vertical){
                                 if(tileGrid[intercepts[i]].clockWise){
-                                    a.applyForce(-20, 0);
+                                    a.velX -= 1;
                                 } else {
-                                    a.applyForce(20, 0);
+                                    a.velX += 1;
                                 }
                             }
                         }
@@ -268,9 +268,9 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                         if(tileGrid[intercepts[i]].kind == 2){
                             if(tileGrid[intercepts[i]].vertical){
                                 if(tileGrid[intercepts[i]].clockWise){
-                                    a.applyForce(0, 20);
+                                    a.velY += 1;
                                 } else {
-                                    a.applyForce(0, -20);
+                                    a.velY -= 1;
                                 }
                             }
                         }
@@ -280,9 +280,9 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                         if(tileGrid[intercepts[i]].kind == 2){
                             if(tileGrid[intercepts[i]].vertical){
                                 if(tileGrid[intercepts[i]].clockWise){
-                                    a.applyForce(0, -20);
+                                    a.velY -= 1;
                                 } else {
-                                    a.applyForce(0, 20);
+                                    a.velY += 1;
                                 }
                             }
                         }

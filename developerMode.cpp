@@ -390,7 +390,7 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
         if(e.mouse1){
             if(create){
                 //makes a new hook, puts it into the vector
-                l.crateList.push_back({(float) (e.mouseX + c.x),(float) (e.mouseY + c.y),50,50, renderer, draw, 15});
+                l.crateList.push_back({(float) (e.mouseX + c.x),(float) (e.mouseY + c.y),50,50, renderer, draw, 4});
             } else {
                 //deletes all hooks within 30 px of mouseclick
                 for(int i = (int) (l.crateList.size()) - 1; i >= 0; i--){

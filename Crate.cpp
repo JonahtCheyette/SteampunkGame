@@ -32,7 +32,7 @@ void Crate::collide(physicsApplied &a){
                 y = a.y - hitbox.height / 2 - a.hitbox.height / 2;
                 velY = 0;
             }
-        } else if ((a.x - a.hitbox.width / 2 + velX) >= (x + hitbox.width / 2 + a.velX)){
+        } else if ((a.x - a.hitbox.width / 2 + velX) >= (x + hitbox.width / 2 + a.velX - 0.01)){
             a.x = x + hitbox.width / 2 + a.hitbox.width / 2;
             inelasticCollide(a, true);
         } else {
