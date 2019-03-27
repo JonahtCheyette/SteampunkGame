@@ -386,6 +386,39 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
             clickstate = 0;
             whichHook = -1;
         }
+    } else if (whichAsset == 4){
+        if(e.mouse1){
+            if(create){
+                //makes a new hook, puts it into the vector
+                l.crateList.push_back({(float) (e.mouseX + c.x),(float) (e.mouseY + c.y),50,50, renderer, draw, 15});
+            } else {
+                //deletes all hooks within 30 px of mouseclick
+                for(int i = (int) (l.crateList.size()) - 1; i >= 0; i--){
+                    if(sqrt(pow(l.crateList[i].x - (e.mouseX + c.x),2) + pow(l.crateList[i].y - (e.mouseY + c.y),2)) <= 30){
+                        l.crateList.erase(l.crateList.begin() + i);
+                    }
+                }
+            }
+            //save to file
+            std::ofstream cFile(l.path + "Crates.txt", std::ofstream::out | std::ofstream::trunc);
+            for(int i = 0; i < l.crateList.size(); i++){
+                std::string s = "";
+                s += std::to_string((int) l.crateList[i].initX);
+                s += " ";
+                s += std::to_string((int) l.crateList[i].initY);
+                s += " ";
+                s += std::to_string((int) l.crateList[i].hitbox.width);
+                s += " ";
+                s += std::to_string((int) l.crateList[i].hitbox.height);
+                s += " ";
+                s += std::to_string((int) l.crateList[i].mass);
+                if(i != l.crateList.size() + 1){
+                    s += "\n";
+                }
+                cFile << s;
+            }
+            cFile.close();
+        }
     }
 }
 
@@ -484,9 +517,9 @@ void developer::switchTile(Event e, std::vector<Object::tileHolder> tileVector, 
             clicked4 = false;
         }
         if(whichAsset < 0){
-            whichAsset = 2;
+            whichAsset = 4;
         }
-        if(whichAsset > 3){
+        if(whichAsset > 4){
             whichAsset = 0;
         }
         if(whichAsset == 0){
@@ -497,6 +530,8 @@ void developer::switchTile(Event e, std::vector<Object::tileHolder> tileVector, 
             whichTexture = draw.loadFromRenderedText("moving hooks (horizontal)", color, font, whichW, whichH, renderer);
         } else if (whichAsset == 3){
             whichTexture = draw.loadFromRenderedText("moving hooks (vertical)", color, font, whichW, whichH, renderer);
+        } else if (whichAsset == 4){
+            whichTexture = draw.loadFromRenderedText("crates", color, font, whichW, whichH, renderer);
         }
     }
 }
@@ -555,8 +590,8 @@ void developer::renderDRect(SDL_Renderer* renderer, std::string type, Event e, L
             heldRect.x = l.hookList[whichHook].limit2 - 4 - c.x;
             SDL_RenderDrawRect(renderer, &heldRect);
         }
-        heldRect.x = l.hookList[whichHook].x - (msW /2);
-        heldRect.y = l.hookList[whichHook].y - (msH/2) - 40;
+        heldRect.x = l.hookList[whichHook].x - (msW /2) - c.x;
+        heldRect.y = l.hookList[whichHook].y - (msH/2) - 40 - c.y;
         heldRect.w = msW;
         heldRect.h = msH;
         SDL_RenderCopy(renderer, moveSpeedTexture, nullptr, &heldRect);
@@ -619,5 +654,16 @@ void developer::changeHookMoveSpeed(Event e, std::vector<Object::Point> &hooks, 
         } else if (!e.keyboard_state_array[SDL_SCANCODE_DOWN]){
             clicked6 = false;
         }
+    }
+}
+
+void developer::reset(Level &l){
+    for(int i = 0; i < l.hookList.size(); i++){
+        l.hookList[i].x = l.hookList[i].initX;
+        l.hookList[i].y = l.hookList[i].initY;
+    }
+    for(int i = 0; i < l.crateList.size(); i++){
+        l.crateList[i].x = l.crateList[i].initX;
+        l.crateList[i].y = l.crateList[i].initY;
     }
 }

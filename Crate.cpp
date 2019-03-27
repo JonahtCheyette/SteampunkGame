@@ -7,9 +7,11 @@ Crate::Crate(float x, float y, float w, float h, SDL_Renderer* renderer, Draw dr
     this -> hitbox.y = y;
     this -> hitbox.width = w;
     this -> hitbox.height = h;
-    this -> texture = draw.loadTexture("Steampunk-Game/Assets/Images/Characters/Square.png", renderer);
+    this -> texture = draw.loadTexture("Steampunk-Game/Assets/Images/Objects/TeenyCrate.png", renderer);
     this -> coeff = 1;
     this -> mass = mass;
+    this -> initX = x;
+    this -> initY = y;
 }
 
 void Crate::collide(physicsApplied &a){
@@ -32,12 +34,10 @@ void Crate::collide(physicsApplied &a){
             }
         } else if ((a.x - a.hitbox.width / 2 + velX) >= (x + hitbox.width / 2 + a.velX)){
             a.x = x + hitbox.width / 2 + a.hitbox.width / 2;
-            a.velX = 0;
-            applyForce(a.mass * -1, 0);
+            inelasticCollide(a, true);
         } else {
             a.x = x - hitbox.width / 2 - a.hitbox.width / 2;
-            a.velX = 0;
-            applyForce(a.mass, 0);
+            inelasticCollide(a, true);
         }
     }
 }

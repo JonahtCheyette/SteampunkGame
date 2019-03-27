@@ -20,3 +20,12 @@ void physicsApplied::applyForce(float fx, float fy){
     accelY += (fy/mass);
 }
 
+void physicsApplied::inelasticCollide(physicsApplied &a, bool xDir){
+    if(xDir){
+        velX = ((mass * velX) + (a.mass * a.velX))/(mass + a.mass);
+        a.velX = velX;
+    } else {
+        velY = ((mass * velY) + (a.mass * a.velY))/(mass + a.mass);
+        a.velY = velY;
+    }
+}

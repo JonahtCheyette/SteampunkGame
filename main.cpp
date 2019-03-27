@@ -61,6 +61,7 @@ int main(int argc, char * args[]) {
 			if (event.keyboard_state_array[SDL_SCANCODE_ESCAPE]) menu.pauseMenuOpen = true;
             if (event.keyboard_state_array[SDL_SCANCODE_Z] && !dSwitch){
                 dMode = !dMode;
+                Dper.reset(levels[whichLevel]);
                 dSwitch = true;
             }
             if(!event.keyboard_state_array[SDL_SCANCODE_Z]){

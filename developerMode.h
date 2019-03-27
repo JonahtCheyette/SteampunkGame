@@ -13,6 +13,7 @@ public:
     void changeHookMoveSpeed(Event e, std::vector<Object::Point> &hooks, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer, std::string path);
     void init(Draw draw, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer);
     void renderDRect(SDL_Renderer* renderer, std::string type, Event e, Level l, Object::Camera c);
+    void reset(Level &l);
     
     //rect for the tile editing rectangle
     SDL_Rect heldRect;
