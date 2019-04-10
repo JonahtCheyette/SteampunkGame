@@ -1,11 +1,11 @@
 #include "stdafx.h"
 
-void Tiles::mapInit(Level level, std::vector<Object::tileHolder> t) {
+void Tiles::mapInit(std::vector< std::vector <int> > tileGrid, std::vector<Object::tileHolder> t) {
     for(int i = 0; i < t.size(); i++){
         if(t[i].tileNum != 0){
-            for (int y = 0; y < level.tileGrid.size(); y++){
-                for(int x = 0; x < level.tileGrid[y].size(); x++){
-                    if(level.tileGrid[y][x] == t[i].tileNum){
+            for (int y = 0; y < tileGrid.size(); y++){
+                for(int x = 0; x < tileGrid[y].size(); x++){
+                    if(tileGrid[y][x] == t[i].tileNum){
                         Object::Tile tile(x * TILE_WIDTH, y * TILE_HEIGHT, t[i].friction, t[i].kind);
                         above = false;
                         below = false;
@@ -14,28 +14,28 @@ void Tiles::mapInit(Level level, std::vector<Object::tileHolder> t) {
                         if(y == 0){
                             above = true;
                         } else {
-                            if(level.tileGrid[y - 1][x] == t[i].tileNum){
+                            if(tileGrid[y - 1][x] == t[i].tileNum){
                                 above = true;
                             }
                         }
-                        if(y == level.tileGrid.size() - 1){
+                        if(y == tileGrid.size() - 1){
                             below = true;
                         } else {
-                            if(level.tileGrid[y + 1][x] == t[i].tileNum){
+                            if(tileGrid[y + 1][x] == t[i].tileNum){
                                 below = true;
                             }
                         }
                         if(x == 0){
                             toTheLeft = true;
                         } else {
-                            if(level.tileGrid[y][x - 1] == t[i].tileNum){
+                            if(tileGrid[y][x - 1] == t[i].tileNum){
                                 toTheLeft = true;
                             }
                         }
-                        if(x == level.tileGrid[0].size() - 1){
+                        if(x == tileGrid[0].size() - 1){
                             toTheRight = true;
                         } else {
-                            if(level.tileGrid[y][x + 1] == t[i].tileNum){
+                            if(tileGrid[y][x + 1] == t[i].tileNum){
                                 toTheRight = true;
                             }
                         }
@@ -172,7 +172,6 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
         overallOverlap[i] = 0;
         intercepts[i] = 0;
     }
-    
     for (int i = 0; i < tileGrid.size(); i++) {
         lEdge = tileGrid[i].x;
         rEdge = lEdge + tileGrid[i].w;
@@ -237,15 +236,16 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                     a.friction = tileGrid[intercepts[i]].f;
                     if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY + 0.01)) {
                         a.y = tEdge - a.hitbox.height / 2;
+                        a.pushableDown = false;
                         if(a.velY >= 0){
                             a.velY = 0;
                             a.airborne = false;
                             if(tileGrid[intercepts[i]].kind == 2){
                                 if(!tileGrid[intercepts[i]].vertical){
                                     if(tileGrid[intercepts[i]].clockWise){
-                                        a.velX += 1;
+                                        a.applyForce(a.mass / 4, 0);
                                     } else {
-                                        a.velX -= 1;
+                                        a.applyForce(-a.mass / 4, 0);
                                     }
                                 }
                             }
@@ -253,36 +253,39 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                     } else if ((a.y - a.hitbox.height / 2) >= (bEdge + a.velY - 0.01)){
                         a.y = bEdge + a.hitbox.height / 2;
                         a.velY = 0;
+                        a.pushableUp = false;
                         if(tileGrid[intercepts[i]].kind == 2){
                             if(!tileGrid[intercepts[i]].vertical){
                                 if(tileGrid[intercepts[i]].clockWise){
-                                    a.velX -= 1;
+                                    a.applyForce(-a.mass / 4, 0);
                                 } else {
-                                    a.velX += 1;
+                                    a.applyForce(a.mass / 4, 0);
                                 }
                             }
                         }
                     } else if ((a.x - a.hitbox.width / 2) >= (rEdge + a.velX - 0.01)){
                         a.x = rEdge + a.hitbox.width / 2;
                         a.velX = 0;
+                        a.pushableLeft = false;
                         if(tileGrid[intercepts[i]].kind == 2){
                             if(tileGrid[intercepts[i]].vertical){
                                 if(tileGrid[intercepts[i]].clockWise){
-                                    a.velY += 1;
+                                    a.applyForce(0, a.mass / 4);
                                 } else {
-                                    a.velY -= 1;
+                                    a.applyForce(0, -a.mass / 4);
                                 }
                             }
                         }
                     } else {
+                        a.pushableRight = false;
                         a.x = lEdge - a.hitbox.width / 2;
                         a.velX = 0;
                         if(tileGrid[intercepts[i]].kind == 2){
                             if(tileGrid[intercepts[i]].vertical){
                                 if(tileGrid[intercepts[i]].clockWise){
-                                    a.velY -= 1;
+                                    a.applyForce(0, -a.mass / 4);
                                 } else {
-                                    a.velY += 1;
+                                    a.applyForce(0, a.mass / 4);
                                 }
                             }
                         }

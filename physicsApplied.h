@@ -16,4 +16,6 @@ public:
     float accelX, accelY;
     float mass;
     float maxXSpeed, maxYSpeed;
+    //for kinematics, to deal with immovable level geometry
+    bool pushableUp, pushableDown, pushableLeft, pushableRight;
 };

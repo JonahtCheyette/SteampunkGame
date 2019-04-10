@@ -1,12 +1,28 @@
 #include "stdafx.h"
 
 SDL_Texture* Draw::loadTexture(std::string path, SDL_Renderer* renderer) {
+    SDL_Texture* newTexture = NULL;
+    //Load image at specified path
+    SDL_Surface* loadedSurface = IMG_Load(path.c_str());
+    if(loadedSurface == NULL){
+        std::cout << "Img didn't load at " + path << std::endl;
+    }
+    //Create texture from surface pixels
+    newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+    //Get rid of old loaded surface
+    SDL_FreeSurface(loadedSurface);
+    return newTexture;
+}
+
+SDL_Texture* Draw::loadTextureWH(std::string path, SDL_Renderer* renderer, int &width, int &height) {
 	SDL_Texture* newTexture = NULL;
 	//Load image at specified path
 	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
     if(loadedSurface == NULL){
         std::cout << "Img didn't load at " + path << std::endl;
     }
+    width = loadedSurface -> w;
+    height = loadedSurface -> h;
 	//Create texture from surface pixels
 	newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 	//Get rid of old loaded surface
@@ -52,17 +68,10 @@ SDL_Texture* Draw::loadFromRenderedText(std::string textureText, SDL_Color textC
     return mTexture;
 }
 
-void Draw::render(SDL_Renderer* renderer, int x, int y, int w, int h, SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip) {
+void Draw::render(SDL_Texture* t, SDL_Renderer* renderer, int x, int y, int w, int h, SDL_Rect* clip, float angle, SDL_Point* center, SDL_RendererFlip flip) {
 	//set rendering space
 	SDL_Rect renderQuad = {x, y, w, h};
-
-	//Set clip rendering dimensions
-	if (clip != NULL)
-	{
-		renderQuad.w = clip->w;
-		renderQuad.h = clip->h;
-	}
-
+    
 	//Render to screen
-	SDL_RenderCopyEx(renderer, Texture, clip, &renderQuad, angle, center, flip);
+	SDL_RenderCopyEx(renderer, t, clip, &renderQuad, angle, center, flip);
 }

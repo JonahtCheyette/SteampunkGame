@@ -43,6 +43,7 @@ Level Level::levelInit(std::string path, SDL_Renderer* renderer, Draw draw){
     level.height = (int) level.tileGrid.size() * TILE_HEIGHT;
     level.width = (int) level.tileGrid[0].size() * TILE_WIDTH;
     level.Start_End = draw.loadTexture("Steampunk-Game/Assets/Images/levelBasics/SPOT.png", renderer);
+    level.CrateDroppers = object.animationInit("Steampunk-Game/Assets/Animations/crateDropper", renderer);
     if(level.width < SCREEN_WIDTH){
         level.width = SCREEN_WIDTH;
     }
@@ -79,7 +80,7 @@ void Level::renderEnd(Object::Camera c, SDL_Renderer* renderer){
     }
 }
 
-void Level::update(physicsApplied &a, Object::Camera c){
+void Level::update(physicsApplied &a, Object::Camera c, Tiles tiles){
     for(int i = 0; i < hookList.size(); i++){
         if (hookList[i].y > c.y - 50 && hookList[i].y < c.y + SCREEN_HEIGHT + 50 && hookList[i].x > c.x - 50 && hookList[i].x < c.x + SCREEN_WIDTH + 50){
             if(hookList[i].vertical){
@@ -96,8 +97,9 @@ void Level::update(physicsApplied &a, Object::Camera c){
         }
     }
     for(int i = 0; i < crateList.size(); i++){
-        if (crateList[i].y + crateList[i].hitbox.height / 2 > c.y - 50 && crateList[i].y - crateList[i].hitbox.height / 2 < c.y + SCREEN_HEIGHT + 50 && crateList[i].x + crateList[i].hitbox.width / 2 > c.x - 50 && crateList[i].x - crateList[i].hitbox.width / 2 < c.x + SCREEN_WIDTH + 50){
+        if (crateList[i].y + crateList[i].hitbox.height / 2 > c.y - physUpdateRange && crateList[i].y - crateList[i].hitbox.height / 2 < c.y + SCREEN_HEIGHT + physUpdateRange && crateList[i].x + crateList[i].hitbox.width / 2 > c.x - physUpdateRange && crateList[i].x - crateList[i].hitbox.width / 2 < c.x + SCREEN_WIDTH + physUpdateRange){
             crateList[i].update();
+            tiles.checkCollision(tiles.loadedLevel, crateList[i]);
             crateList[i].collide(a);
             crateList[i].doFriction();
         }
@@ -108,6 +110,8 @@ void Level::draw(SDL_Renderer* renderer, Object::Camera c){
     for(int i = 0; i < crateList.size(); i++){
         if (crateList[i].y + crateList[i].hitbox.height / 2 > c.y && crateList[i].y - crateList[i].hitbox.height / 2 < c.y + SCREEN_HEIGHT && crateList[i].x + crateList[i].hitbox.width / 2 > c.x && crateList[i].x - crateList[i].hitbox.width / 2 < c.x + SCREEN_WIDTH){
             SDL_Rect destination;
+            crateList[i].hitbox.x = crateList[i].x;
+            crateList[i].hitbox.y = crateList[i].y;
             destination.x = crateList[i].x - crateList[i].hitbox.width / 2 - c.x;
             destination.y = crateList[i].y - crateList[i].hitbox.height / 2 - c.y;
             destination.w = crateList[i].hitbox.width;
@@ -115,4 +119,6 @@ void Level::draw(SDL_Renderer* renderer, Object::Camera c){
             SDL_RenderCopy(renderer, crateList[i].texture, nullptr, &destination);
         }
     }
+    //My Shitty, temporary cratedropper drawing code
+    object.renderAnimation(CrateDroppers, renderer, 4679 - c.x, -c.y, 200, 200);
 }

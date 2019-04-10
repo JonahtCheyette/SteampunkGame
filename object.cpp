@@ -43,7 +43,7 @@ void Object::drawPoint(Point a, Camera b, SDL_Renderer* renderer) {
 	destination.w = 16;
 	destination.h = 16;
 
-	SDL_RenderCopy(renderer, player, nullptr, &destination);
+	SDL_RenderCopy(renderer, hook, nullptr, &destination);
 }
 
 //FOR DRAWING HOOKS ONLY
@@ -61,7 +61,7 @@ void Object::drawHooks(std::vector<Object:: Point> a, Camera b, int selected, SD
         destination.y = a[i].y - 8 - b.y;
         destination.w = 16;
         destination.h = 16;
-        SDL_RenderCopy(renderer, player, nullptr, &destination);
+        SDL_RenderCopy(renderer, hook, nullptr, &destination);
     }
 }
 
@@ -130,9 +130,33 @@ Object::Layer::Layer(float s, int w, int h, std::string path, SDL_Renderer* rend
     this -> h = h;
 }
 
+Object::Animation::Animation(){}
+
+Object::Animation::Animation(std::string path, SDL_Renderer* renderer){
+    std::ifstream aFile(path + ".txt");
+    aFile >> fps >> w >> h >> getRidOf;
+    aFile.close();
+    frameGap = floor(60/fps);
+    currentFrame = 0;
+    animation = draw.loadTextureWH(path + ".png", renderer, sW, sH);
+    SDL_Rect clipper;
+    for(int i = 0; i < floor(sH/h); i++){
+        for(int j = 0; j < floor(sW/w); j++){
+            clipper.x = j * w;
+            clipper.y = i * h;
+            clipper.w = w;
+            clipper.h = h;
+            clip.push_back(clipper);
+        }
+    }
+    for(int i = 0; i < getRidOf; i++){
+        clip.pop_back();
+    }
+}
+
 void Object:: textureInit(SDL_Renderer* renderer){
-    player = draw.loadTexture("Steampunk-Game/Assets/Images/Characters/Square.png", renderer);
-    single = draw.loadTexture("Steampunk-Game/Assets/Images/tileTextures/test1/single.png", renderer);
+    hook = draw.loadTexture("Steampunk-Game/Assets/Images/levelBasics/HookPlaceholder.png", renderer);
+    single = draw.loadTexture("Steampunk-Game/Assets/Images/tileTextures/girders/single.png", renderer);
 }
 
 void Object:: moveCamera(Camera &a, int x, int y, int w, int h){
@@ -140,6 +164,24 @@ void Object:: moveCamera(Camera &a, int x, int y, int w, int h){
     a.y = (y) - SCREEN_HEIGHT / 2;
     if(a.x + SCREEN_WIDTH > w) a.x = w - SCREEN_WIDTH;
     if (a.x < 0) a.x = 0;
-    if(a.y < 0) a.y = 0;
     if(a.y + SCREEN_HEIGHT > h) a.y = h - SCREEN_HEIGHT;
+    if(a.y < 0) a.y = 0;
+}
+
+void Object::renderAnimation(Animation &a, SDL_Renderer* renderer, int x, int y, int w, int h){
+    a.currentClip = &a.clip[a.currentFrame / a.frameGap];
+    if(w == 0 || h == 0){
+        draw.render(a.animation, renderer, x, y, a.w, a.h, a.currentClip);
+    } else {
+        draw.render(a.animation, renderer, x, y, w, h, a.currentClip);
+    }
+    a.currentFrame++;
+    if(a.currentFrame / a.frameGap >= a.clip.size()){
+        a.currentFrame = 0;
+    }
+}
+
+Object::Animation Object::animationInit(std::string path, SDL_Renderer *renderer){
+    Animation a(path, renderer);
+    return a;
 }

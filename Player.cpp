@@ -9,8 +9,8 @@ Player::Player(SDL_Renderer* renderer, Draw draw){
     accelY = Gravity;
     mass = 20;
     
-    hitbox.height = 96;
-    hitbox.width = 48;
+    hitbox.height = 88;
+    hitbox.width = 64;
 
     maxXSpeed = 10;
     maxYSpeed = 10;
@@ -29,7 +29,11 @@ Player::Player(SDL_Renderer* renderer, Draw draw){
     hookState = 0;
     changedHook = false;
     clicked = false;
-    player = draw.loadTexture("Steampunk-Game/Assets/Images/Characters/Square.png", renderer);
+    player = draw.loadTexture("Steampunk-Game/Assets/Images/Characters/Tpose.png", renderer);
+    pushableUp = true;
+    pushableDown = true;
+    pushableLeft = true;
+    pushableRight = true;
 }
 
 void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::Tile> tileGrid, int &which, int maxLevel) {
@@ -55,14 +59,6 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
     if(!(event.keyboard_state_array[SDL_SCANCODE_LEFT] && event.keyboard_state_array[SDL_SCANCODE_RIGHT]) && l.hookList.size() > 0){
         if (event.keyboard_state_array[SDL_SCANCODE_LEFT]) changeHooks(l.hookList, -1, c);
         if (event.keyboard_state_array[SDL_SCANCODE_RIGHT]) changeHooks(l.hookList, 1, c);
-    }
-    
-    if (event.keyboard_state_array[SDL_SCANCODE_E] && !clicked && hookState != 2) {
-        rope = !rope;
-        clicked = true;
-    }
-    if(!event.keyboard_state_array[SDL_SCANCODE_E]){
-        clicked = false;
     }
     
     if (event.keyboard_state_array[SDL_SCANCODE_SPACE] && !grappling && l.hookList.size() > 0) {

@@ -7,7 +7,7 @@ class Object {
 	
 	public:
         void textureInit(SDL_Renderer* renderer);
-        SDL_Texture* player;
+        SDL_Texture* hook;
         SDL_Texture* single;
 		//camera object
 		struct Camera {
@@ -108,5 +108,32 @@ class Object {
             Layer(float s, int w, int h, std::string path, SDL_Renderer* renderer);
         };
     
+        struct Animation {
+            //frames per second
+            int fps;
+            //how many fames are between each new frame pf animation
+            int frameGap;
+            //how many frames of animation are there
+            int frames;
+            //empty spaces in the spritesheets to get rid of. ex: a 3*3 spritesheet with only 8 sprites, so this would be set to 1
+            int getRidOf;
+            //what frame the animation is on
+            int currentFrame;
+            //width, height of animation;
+            int w, h;
+            //width, height of spritesheet
+            int sW, sH;
+            //the clip of the textures
+            std::vector<SDL_Rect> clip;
+            //current clip to render the image by
+            SDL_Rect* currentClip;
+            //the spritesheet to animate off of
+            SDL_Texture* animation;
+            Animation(std::string path, SDL_Renderer* renderer);
+            Animation();
+        };
+    
         void moveCamera(Camera &a, int x, int y, int w, int h);
+    void renderAnimation(Animation &a, SDL_Renderer* renderer, int x, int y, int w = 0, int h = 0);
+        Animation animationInit(std::string path, SDL_Renderer* renderer);
 };

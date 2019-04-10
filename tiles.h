@@ -3,7 +3,7 @@
 
 class Tiles {
 public:
-    void mapInit(Level level, std::vector<Object::tileHolder> t);
+    void mapInit(std::vector< std::vector <int> > tileGrid, std::vector<Object::tileHolder> t);
     void drawTiles(std::vector<Object::Tile> tileGrid, Object::Camera camera, SDL_Renderer* renderer, std::vector<Object::tileHolder> t);
     
     void checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a);

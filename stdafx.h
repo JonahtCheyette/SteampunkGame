@@ -34,11 +34,11 @@ static Event event;
 static Menu menu;
 #include "draw.h"
 #include "Crate.h"
-#include "Level.h"
 static Draw draw;
-#include "Player.h"
 #include "tiles.h"
 static Tiles tiles;
+#include "Level.h"
+#include "Player.h"
 #include "loader.h"
 static Loader loader;
 #include "developerMode.h"
@@ -47,21 +47,11 @@ static developer Dper;
 constexpr auto SCREEN_WIDTH = (1920 / 3) * 2; // accounting for scaling on personal device
 constexpr auto SCREEN_HEIGHT = (1080 / 3) * 2;
 
+//radius offscreen of physics updates for objects, e.g. if they are offscreen but within this many pixels, they will still do physics
+constexpr auto physUpdateRange = 1000;
+
 constexpr auto TILE_WIDTH = 32;
 constexpr auto TILE_HEIGHT = 32;
-
-//constexpr auto overlap = 24 * TILE_HEIGHT - LEVEL_HEIGHT;
-
-//tile types
-constexpr auto topLeft = 1;
-constexpr auto top = 2;
-constexpr auto topRight = 3;
-constexpr auto right = 4;
-constexpr auto bottomRight = 5;
-constexpr auto bottom = 6;
-constexpr auto bottomLeft = 7;
-constexpr auto left = 8;
-constexpr auto center = 9;
 
 //physics constants
 constexpr auto grappleStrength = -40;

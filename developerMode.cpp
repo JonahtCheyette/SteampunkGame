@@ -228,11 +228,11 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
                 s += " ";
                 s += std::to_string((int) l.hookList[i].initY);
                 s += " ";
-                s += std::to_string((int) l.hookList[i].limit1);
+                s += std::to_string(0);
                 s += " ";
-                s += std::to_string((int) l.hookList[i].limit2);
+                s += std::to_string(0);
                 s += " ";
-                s += std::to_string((int) l.hookList[i].moveSpeed);
+                s += std::to_string(0);
                 s += " ";
                 s += std::to_string(l.hookList[i].vertical);
                 if(i != l.hookList.size() + 1){
@@ -245,9 +245,9 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
     } else if (whichAsset == 1) {
         //click to pick up, click to put down
         if(e.mouse1 && clickstate == 0){
-            if(sqrt(pow(l.end.x - e.mouseX,2) + pow(l.end.y - e.mouseY,2)) <= 30){
+            if(sqrt(pow(l.end.x - (e.mouseX + c.x),2) + pow(l.end.y - (e.mouseY + c.y),2)) <= 30){
                 spawn = false;
-            } else if (sqrt(pow(l.spawn.x - e.mouseX,2) + pow(l.spawn.y - e.mouseY,2)) <= 30) {
+            } else if (sqrt(pow(l.spawn.x - (e.mouseX + c.x),2) + pow(l.spawn.y - (e.mouseY + c.y),2)) <= 30) {
                 spawn = true;
             }
             clickstate = 1;
@@ -301,6 +301,7 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
                 }
             }
             //save to file
+            std::cout<<"h";
             std::ofstream hFile(l.path + "hooks.txt", std::ofstream::out | std::ofstream::trunc);
             for(int i = 0; i < l.hookList.size(); i++){
                 std::string s = "";
@@ -390,7 +391,7 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
         if(e.mouse1){
             if(create){
                 //makes a new hook, puts it into the vector
-                l.crateList.push_back({(float) (e.mouseX + c.x),(float) (e.mouseY + c.y),50,50, renderer, draw, 4});
+                l.crateList.push_back({(float) (e.mouseX + c.x),(float) (e.mouseY + c.y),70,70, renderer, draw, 4});
             } else {
                 //deletes all hooks within 30 px of mouseclick
                 for(int i = (int) (l.crateList.size()) - 1; i >= 0; i--){
@@ -665,5 +666,7 @@ void developer::reset(Level &l){
     for(int i = 0; i < l.crateList.size(); i++){
         l.crateList[i].x = l.crateList[i].initX;
         l.crateList[i].y = l.crateList[i].initY;
+        l.crateList[i].velX = 0;
+        l.crateList[i].velY = 0;
     }
 }

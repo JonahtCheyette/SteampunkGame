@@ -21,7 +21,7 @@ void Loader::loadTiles(std::vector<Object::tileHolder> &t, std::string path, SDL
     mFile.close();
 }
 
-void Loader::loadLevels(std::vector<Level> &l, std::string path, SDL_Renderer* renderer, Draw draw){
+void Loader::loadLevels(std::vector<Level> &l, std::string path, SDL_Renderer* renderer){
     dr = opendir(path.c_str());
     if(dr == NULL){
         std::cout<<"could not open directory"<<std::endl;

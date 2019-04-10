@@ -20,23 +20,20 @@ void backGround::drawBackground(SDL_Renderer* renderer, Object::Camera c, int h)
         }
         start = destination.x;
         if(destination.w < SCREEN_WIDTH){
-            xAmount = ceil(SCREEN_WIDTH / destination.w) + 1;
+            xAmount = ceil(SCREEN_WIDTH / destination.w) + 2;
         } else {
             xAmount = 2;
         }
-        if((destination.x + (xAmount * l[i].w)) - SCREEN_WIDTH > l[i].w){
-            xAmount -= 1;
-        }
-        while(destination.y < -destination.h){
-            destination.y += destination.h;
+        if(destination.x > -1 * (SCREEN_WIDTH - floor(SCREEN_WIDTH / destination.w) * destination.w)){
+            xAmount --;
         }
         if(destination.h < SCREEN_HEIGHT){
             yAmount = ceil(SCREEN_HEIGHT / destination.h) + 2;
         } else {
             yAmount = 2;
         }
-        if((destination.y + (yAmount * l[i].h)) - SCREEN_HEIGHT > l[i].h){
-            yAmount -= 1;
+        if(destination.y > -1 * (SCREEN_HEIGHT - floor(SCREEN_HEIGHT / destination.h) * destination.h)){
+            yAmount --;
         }
         for(int j = 0 ; j <= yAmount; j++){
             for(int k = 0 ; k <= xAmount; k++){

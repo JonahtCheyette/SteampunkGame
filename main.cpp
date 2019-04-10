@@ -6,7 +6,7 @@ int main(int argc, char * args[]) {
 	SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
-	SDL_Window* window = SDL_CreateWindow("SDL Testing things", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	SDL_Window* window = SDL_CreateWindow("STEAMPUNK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// add in " | SDL_RENDERER_PRESENTVSYNC" after SDL_RENDERER_ACCELERATED for vsync
 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 	SDL_Event e;
@@ -24,9 +24,9 @@ int main(int argc, char * args[]) {
     std::vector<Level> levels;
     
     loader.loadTiles(tileVector, "Steampunk-Game/tData/", renderer);
-    loader.loadLevels(levels, "Steampunk-Game/Levels", renderer, draw);
+    loader.loadLevels(levels, "Steampunk-Game/Levels", renderer);
     
-    bool dMode = true;
+    bool dMode = false;
     bool dSwitch = false;
     Dper.init(draw, black, Sans, renderer);
     player.x = levels[whichLevel].spawn.x;
@@ -36,7 +36,7 @@ int main(int argc, char * args[]) {
     
 	Object::Camera camera;
     
-	tiles.mapInit(levels[whichLevel], tileVector);
+	tiles.mapInit(levels[whichLevel].tileGrid, tileVector);
     
     object.textureInit(renderer);
 	menu.menuInit(renderer);
@@ -62,6 +62,7 @@ int main(int argc, char * args[]) {
             if (event.keyboard_state_array[SDL_SCANCODE_Z] && !dSwitch){
                 dMode = !dMode;
                 Dper.reset(levels[whichLevel]);
+                Dper.init(draw, black, Sans, renderer);
                 dSwitch = true;
             }
             if(!event.keyboard_state_array[SDL_SCANCODE_Z]){
@@ -75,14 +76,12 @@ int main(int argc, char * args[]) {
 			}
             if(!dMode){
                 player.move(e, levels[whichLevel], camera, tiles.loadedLevel, whichLevel, (int) (levels.size()));
+                
                 player.moveHook(levels[whichLevel].hookList);
-            
+                
+                levels[whichLevel].update(player, camera, tiles);
+                
                 tiles.checkCollision(tiles.loadedLevel, player);
-
-                levels[whichLevel].update(player, camera);
-                for(int i = 0; i < levels[whichLevel].crateList.size(); i++){
-                    tiles.checkCollision(tiles.loadedLevel, levels[whichLevel].crateList[i]);
-                }
                 
                 object.moveCamera(camera, player.x, player.y, levels[whichLevel].width, levels[whichLevel].height);
             } else {
