@@ -151,14 +151,9 @@ void Tiles::mapInit(std::vector< std::vector <int> > tileGrid, std::vector<Objec
 }
 
 void Tiles::drawTiles(std::vector<Object::Tile> tileGrid, Object::Camera camera, SDL_Renderer* renderer, std::vector<Object::tileHolder> t) {
-    SDL_Rect destination;
-    destination.w = TILE_WIDTH;
-    destination.h = TILE_HEIGHT;
 	for (int i = 0; i < tileGrid.size(); i++) {
         if (tileGrid[i].y + tileGrid[i].h > camera.y && tileGrid[i].y < camera.y + SCREEN_HEIGHT && tileGrid[i].x + tileGrid[i].w > camera.x && tileGrid[i].x < camera.x + SCREEN_WIDTH){
-            destination.x = tileGrid[i].x - camera.x;
-            destination.y = tileGrid[i].y - camera.y;
-            SDL_RenderCopy(renderer, tileGrid[i].texture, nullptr, &destination);
+            tileGrid[i].texture.render(renderer, tileGrid[i].x + (TILE_WIDTH / 2), tileGrid[i].y + (TILE_HEIGHT/2), camera.x, camera.y, TILE_HEIGHT, TILE_WIDTH);
         }
 	}
 }
@@ -292,6 +287,7 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                     }
                 } else {
                     if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY + 0.01)) {
+                        a.pushableDown = false;
                         a.friction = tileGrid[intercepts[i]].f;
                         a.y = tEdge - a.hitbox.height / 2;
                         if(a.velY >= 0){

@@ -9,10 +9,10 @@ public:
 	void drawPauseMenu(SDL_Renderer* renderer);
 
 	void mainMenuButtons(int mouseX, int mouseY, bool mouse1, bool &quit, bool &inGame);
-	void pauseMenuButtons(int mouseX, int mouseY, bool mouse1, bool &quit, bool &pauseMenuOpen);
+	void pauseMenuButtons(int mouseX, int mouseY, bool mouse1, bool &quit);
 
-	SDL_Texture* mainMenu;
-	SDL_Texture* pauseMenu;
+	Sprite mainMenu;
+	Sprite pauseMenu;
 
 	SDL_Rect mainMenuDest;
 	SDL_Rect pauseMenuDest;

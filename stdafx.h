@@ -24,6 +24,7 @@
 #include <vector>
 #include <fstream>
 
+#include "Sprite.h"
 #include "object.h"
 static Object object;
 #include "background.h"
@@ -32,9 +33,7 @@ static Object object;
 static Event event;
 #include "menu.h"
 static Menu menu;
-#include "draw.h"
 #include "Crate.h"
-static Draw draw;
 #include "tiles.h"
 static Tiles tiles;
 #include "Level.h"
@@ -45,7 +44,7 @@ static Loader loader;
 static developer Dper;
 
 constexpr auto SCREEN_WIDTH = (1920 / 3) * 2; // accounting for scaling on personal device
-constexpr auto SCREEN_HEIGHT = (1080 / 3) * 2;
+constexpr auto SCREEN_HEIGHT = (1200 / 3) * 2;
 
 //radius offscreen of physics updates for objects, e.g. if they are offscreen but within this many pixels, they will still do physics
 constexpr auto physUpdateRange = 1000;

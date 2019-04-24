@@ -7,18 +7,16 @@ int main(int argc, char * args[]) {
     TTF_Init();
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "1");
 	SDL_Window* window = SDL_CreateWindow("STEAMPUNK", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+    //SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);// add in " | SDL_RENDERER_PRESENTVSYNC" after SDL_RENDERER_ACCELERATED for vsync
 	SDL_SetRenderDrawColor(renderer, 0xff, 0xff, 0xff, 0xff);
 	SDL_Event e;
-    SDL_Color black = {1,0,0};
+    SDL_Color black = {0,0,0};
     TTF_Font* Sans = TTF_OpenFont("Steampunk-Game/Assets/Fonts/comic.ttf", 28);
-    if(Sans == NULL){
-        std::cout<<"j";
-    }
     
     int whichLevel = 0;
     
-    Player player(renderer, draw);
+    Player player(renderer);
     
     std::vector<Object::tileHolder> tileVector;
     std::vector<Level> levels;
@@ -28,7 +26,7 @@ int main(int argc, char * args[]) {
     
     bool dMode = false;
     bool dSwitch = false;
-    Dper.init(draw, black, Sans, renderer);
+    Dper.init(black, Sans, renderer);
     player.x = levels[whichLevel].spawn.x;
     player.y = levels[whichLevel].spawn.y;
     
@@ -50,7 +48,7 @@ int main(int argc, char * args[]) {
         
 		menu.mainMenuButtons(event.mouseX, event.mouseY, event.mouse1, event.quit, event.inGame);
 		menu.drawMainMenu(renderer);
-		while (event.inGame) {//game loop
+		while (event.inGame && !event.quit) {//game loop
 			SDL_SetRenderDrawColor(renderer, 255, 255, 255, SDL_ALPHA_OPAQUE);
 			SDL_RenderClear(renderer);
 			SDL_SetRenderDrawColor(renderer, 0, 0, 0, SDL_ALPHA_OPAQUE);
@@ -62,16 +60,18 @@ int main(int argc, char * args[]) {
             if (event.keyboard_state_array[SDL_SCANCODE_Z] && !dSwitch){
                 dMode = !dMode;
                 Dper.reset(levels[whichLevel]);
-                Dper.init(draw, black, Sans, renderer);
+                Dper.init(black, Sans, renderer);
                 dSwitch = true;
             }
             if(!event.keyboard_state_array[SDL_SCANCODE_Z]){
                 dSwitch = false;
             }
 			while (menu.pauseMenuOpen && !event.quit) {
-				menu.drawPauseMenu(renderer);
-				menu.pauseMenuButtons(event.mouseX, event.mouseY, event.mouse1, event.quit, menu.pauseMenuOpen);
-
+                event.update(e);
+				menu.pauseMenuButtons(event.mouseX, event.mouseY, event.mouse1Released, event.quit);
+                
+                menu.drawPauseMenu(renderer);
+                
 				SDL_RenderPresent(renderer);
 			}
             if(!dMode){
@@ -79,9 +79,9 @@ int main(int argc, char * args[]) {
                 
                 player.moveHook(levels[whichLevel].hookList);
                 
-                levels[whichLevel].update(player, camera, tiles);
-                
                 tiles.checkCollision(tiles.loadedLevel, player);
+                
+                levels[whichLevel].update(player, camera, tiles);
                 
                 object.moveCamera(camera, player.x, player.y, levels[whichLevel].width, levels[whichLevel].height);
             } else {
@@ -92,7 +92,7 @@ int main(int argc, char * args[]) {
                     Dper.editAssets(camera, event, levels[whichLevel], renderer, black, Sans);
                 }
                 Dper.createSwitch(event, black, Sans, renderer);
-                Dper.typeSwitch(event, type, black, Sans, renderer, draw);
+                Dper.typeSwitch(event, type, black, Sans, renderer);
                 Dper.switchTile(event, tileVector, type, black, Sans, renderer);
                 Dper.changeHookMoveSpeed(event, levels[whichLevel].hookList, black, Sans, renderer, levels[whichLevel].path);
             }
@@ -110,18 +110,19 @@ int main(int argc, char * args[]) {
             levels[whichLevel].renderEnd(camera, renderer);
             
             if(dMode) {
-                Dper.showEditing(draw, type, black, Sans, tileVector, renderer);
+                Dper.showEditing(type, black, Sans, tileVector, renderer);
                 Dper.renderDRect(renderer, type, event, levels[whichLevel], camera);
             }
             
             if(player.hookState == 2) SDL_RenderDrawLine(renderer, player.x - camera.x, player.y - camera.y, player.target.x - camera.x, player.target.y - camera.y);
             if(player.hookState == 1 || player.hookState == 3) SDL_RenderDrawLine(renderer, player.x - camera.x, player.y - camera.y, player.grappleHead.x - camera.x, player.grappleHead.y - camera.y);
-			SDL_RenderPresent(renderer);
+            if(!menu.pauseMenuOpen){
+                SDL_RenderPresent(renderer);
+            }
 		}
         SDL_RenderPresent(renderer);
         if(event.quit) break;
 	}
-	draw.free();
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	window = nullptr;

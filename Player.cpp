@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-Player::Player(SDL_Renderer* renderer, Draw draw){
+Player::Player(SDL_Renderer* renderer){
     x = 500;
     y = 0;
     velX = 0;
@@ -15,6 +15,7 @@ Player::Player(SDL_Renderer* renderer, Draw draw){
     maxXSpeed = 10;
     maxYSpeed = 10;
     acceleration = 5;
+    coeff = 1.5;
     
     //vars for grapple movement
     distance = 0;
@@ -29,7 +30,7 @@ Player::Player(SDL_Renderer* renderer, Draw draw){
     hookState = 0;
     changedHook = false;
     clicked = false;
-    player = draw.loadTexture("Steampunk-Game/Assets/Images/Characters/Tpose.png", renderer);
+    player.load("Steampunk-Game/Assets/Images/Characters/Tpose.png", renderer);
     pushableUp = true;
     pushableDown = true;
     pushableLeft = true;
@@ -72,20 +73,19 @@ void Player::move(SDL_Event& e, Level l, Object::Camera c, std::vector<Object::T
         applyForce(velX * (-1 * friction * mass * Gravity), 0);
     }
     
-    update();
-    
     if (velX > maxXSpeed) velX = maxXSpeed;
     if (velX < -maxXSpeed) velX = -maxXSpeed;
-
+    
     if(hookState == 2){
         if (velY > maxYSpeed) velY = maxYSpeed;
         if (velY < -maxYSpeed) velY = -maxYSpeed;
     }
     
+    update();
+    
     hitbox.x = x;
     hitbox.y = y;
     friction = 0;
-    airborne = true;
     if(hitbox.x + hitbox.width / 2 > l.width){
         x = l.width - (hitbox.width/2);
         velX = 0;
@@ -266,10 +266,5 @@ void Player::changeHooks(std::vector<Object:: Point> b , int change, Object::Cam
 }
 
 void Player::draw(Object::Camera b, SDL_Renderer* renderer) {
-    SDL_Rect destination;
-    destination.x = x - hitbox.width / 2 - b.x;
-    destination.y = y - hitbox.height / 2 - b.y;
-    destination.w = hitbox.width;
-    destination.h = hitbox.height;
-    SDL_RenderCopy(renderer, player, nullptr, &destination);
+    player.render(renderer, x, y, b.x, b.y, hitbox.width, hitbox.height);
 }

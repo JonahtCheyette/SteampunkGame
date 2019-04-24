@@ -4,17 +4,22 @@
 class developer {
 public:
     void moveCamera(Object::Camera &camera, Event event);
-    void showEditing(Draw draw, std::string type, SDL_Color color, TTF_Font* font, std::vector<Object::tileHolder> tileVector, SDL_Renderer* renderer);
+    void showEditing(std::string type, SDL_Color color, TTF_Font* font, std::vector<Object::tileHolder> tileVector, SDL_Renderer* renderer);
     void editLevel(Object::Camera camera, std::vector<Object::tileHolder> tileVector, Level level, SDL_Renderer* renderer, Event event, std::vector<Object::Tile> &tileGrid);
-    void editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* renderer, SDL_Color color, TTF_Font* font);
+    void editAssets(Object::Camera c, Event e, Level &l, SDL_Renderer* renderer, SDL_Color color, TTF_Font* font);
     void createSwitch(Event e, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer);
-    void typeSwitch(Event e, std::string &type, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer, Draw draw);
+    void typeSwitch(Event e, std::string &type, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer);
     void switchTile(Event e, std::vector<Object::tileHolder> tileVector, std::string type, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer);
     void changeHookMoveSpeed(Event e, std::vector<Object::Point> &hooks, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer, std::string path);
-    void init(Draw draw, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer);
+    void init(SDL_Color color, TTF_Font* font, SDL_Renderer* renderer);
     void renderDRect(SDL_Renderer* renderer, std::string type, Event e, Level l, Object::Camera c);
     void reset(Level &l);
     
+private:
+    //camera move speed
+    int moveSpeed;
+    //bools to make key presses activate on press, not eveyframe they are held down
+    bool clicked1,clicked2,clicked3,clicked4, clicked5, clicked6;
     //rect for the tile editing rectangle
     SDL_Rect heldRect;
     //to hold the rects size and position for actually editing the file
@@ -23,18 +28,14 @@ public:
     //safety feature to make sure everything that involves the steps of click, hold release works as planned
     int clickstate;
     bool held;
-    //bools to make key presses activate on press, not eveyframe they are held down
-    bool clicked1,clicked2,clicked3,clicked4, clicked5, clicked6;
-    //camera move speed
-    int moveSpeed;
     //what kind of ile is being put down by index in tileVector
     int whichTile;
     //for writing what mode you're in to the topleft corner
-    SDL_Texture* typeTexture;
-    SDL_Texture* createTexture;
-    SDL_Texture* whichTexture;
+    Sprite typeTexture;
+    Sprite createTexture;
+    Sprite whichTexture;
     //for writing what a hook's movement speed is
-    SDL_Texture* moveSpeedTexture;
+    Sprite moveSpeedTexture;
     //ints to hold how large the above textures are so nothing gets awkwardly compressed
     int typeW, typeH;
     int createW, createH;

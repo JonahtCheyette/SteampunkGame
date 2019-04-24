@@ -186,22 +186,12 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
     }
 }
 
-void developer::showEditing(Draw draw, std::string type, SDL_Color color, TTF_Font* font, std::vector<Object::tileHolder> tileVector, SDL_Renderer* renderer){
+void developer::showEditing(std::string type, SDL_Color color, TTF_Font* font, std::vector<Object::tileHolder> tileVector, SDL_Renderer* renderer){
     //this is what prints the mode to topleft corner of screen
-    destination.y = 0;
-    destination.w = typeW;
-    destination.h = typeH;
-    SDL_RenderCopy(renderer, typeTexture, nullptr, &destination);
-    //move it down, edit bounding box
-    destination.y = 50;
-    destination.w = createW;
-    destination.h = createH;
-    SDL_RenderCopy(renderer, createTexture, nullptr, &destination);
+    typeTexture.render(renderer, typeTexture.getWidth() / 2, typeTexture.getHeight() / 2);
+    createTexture.render(renderer, createTexture.getWidth() / 2, 50 + createTexture.getHeight() / 2);
     if(create || type != "drag"){
-        destination.y = 100;
-        destination.w = whichW;
-        destination.h = whichH;
-        SDL_RenderCopy(renderer, whichTexture, nullptr, &destination);
+        whichTexture.render(renderer, whichTexture.getWidth() / 2, 100 + whichTexture.getHeight() / 2);
     }
 }
 
@@ -272,7 +262,7 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
                 if(sqrt(pow(l.hookList[i].x - (e.mouseX + c.x),2) + pow(l.hookList[i].y - (e.mouseY + c.y),2)) <= 30 && whichHook == -1 && l.hookList[i].moving){
                     whichHook = i;
                     clickstate = 1;
-                    moveSpeedTexture = draw.loadFromRenderedText(std::to_string((int) l.hookList[i].moveSpeed), color, font, msW, msH, renderer);
+                    moveSpeedTexture.loadText(std::to_string((int) l.hookList[i].moveSpeed), color, font, renderer);
                 }
             }
             if(create){
@@ -391,7 +381,7 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
         if(e.mouse1){
             if(create){
                 //makes a new hook, puts it into the vector
-                l.crateList.push_back({(float) (e.mouseX + c.x),(float) (e.mouseY + c.y),70,70, renderer, draw, 4});
+                l.crateList.push_back({(float) (e.mouseX + c.x),(float) (e.mouseY + c.y),70,70, renderer, 2});
             } else {
                 //deletes all hooks within 30 px of mouseclick
                 for(int i = (int) (l.crateList.size()) - 1; i >= 0; i--){
@@ -428,9 +418,9 @@ void developer::createSwitch(Event e, SDL_Color color, TTF_Font* font, SDL_Rende
     if(e.keyboard_state_array[SDL_SCANCODE_Q] && !clicked1){
         create = !create;
         if(create){
-            createTexture = draw.loadFromRenderedText("create", color, font, createW, createH, renderer);
+            createTexture.loadText("create", color, font, renderer);
         } else {
-            createTexture = draw.loadFromRenderedText("destroy", color, font, createW, createH, renderer);
+            createTexture.loadText("destroy", color, font, renderer);
         }
         clicked1 = true;
     } else if (!e.keyboard_state_array[SDL_SCANCODE_Q]){
@@ -438,7 +428,7 @@ void developer::createSwitch(Event e, SDL_Color color, TTF_Font* font, SDL_Rende
     }
 }
 
-void developer::typeSwitch(Event e, std::string &type, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer, Draw draw){
+void developer::typeSwitch(Event e, std::string &type, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer){
     //swithes type from drag to clck and changes appropriate texture
     if(e.keyboard_state_array[SDL_SCANCODE_E] && !clicked2){
         if(type == "drag"){
@@ -446,14 +436,14 @@ void developer::typeSwitch(Event e, std::string &type, SDL_Color color, TTF_Font
             clickstate = 0;
             held = false;
             if(whichAsset == 0){
-                whichTexture = draw.loadFromRenderedText("hooks", color, font, whichW, whichH, renderer);
+                whichTexture.loadText("hooks", color, font, renderer);
             } else if (whichAsset == 1) {
-                whichTexture = draw.loadFromRenderedText("spawn/end points", color, font, whichW, whichH, renderer);
+                whichTexture.loadText("spawn/end points", color, font, renderer);
             }
-            typeTexture = draw.loadFromRenderedText("click", color, font, typeW, typeH, renderer);
+            typeTexture.loadText("click", color, font, renderer);
         } else {
             type = "drag";
-            typeTexture = draw.loadFromRenderedText("drag", color, font, typeW, typeH, renderer);
+            typeTexture.loadText("drag", color, font, renderer);
             clickstate = 0;
         }
         clicked2 = true;
@@ -497,9 +487,9 @@ void developer::switchTile(Event e, std::vector<Object::tileHolder> tileVector, 
             } else {
                 assembleString += "counterclockwise";
             }
-            whichTexture = draw.loadFromRenderedText(assembleString, color, font, whichW, whichH, renderer);
+            whichTexture.loadText(assembleString, color, font, renderer);
         } else {
-            whichTexture = draw.loadFromRenderedText(tileVector[whichTile].Dpath, color, font, whichW, whichH, renderer);
+            whichTexture.loadText(tileVector[whichTile].Dpath, color, font, renderer);
         }
     } else {
         //other assets
@@ -524,20 +514,20 @@ void developer::switchTile(Event e, std::vector<Object::tileHolder> tileVector, 
             whichAsset = 0;
         }
         if(whichAsset == 0){
-            whichTexture = draw.loadFromRenderedText("hooks", color, font, whichW, whichH, renderer);
+            whichTexture.loadText("hooks", color, font, renderer);
         } else if (whichAsset == 1) {
-            whichTexture = draw.loadFromRenderedText("spawn/end points", color, font, whichW, whichH, renderer);
+            whichTexture.loadText("spawn/end points", color, font, renderer);
         } else if (whichAsset == 2){
-            whichTexture = draw.loadFromRenderedText("moving hooks (horizontal)", color, font, whichW, whichH, renderer);
+            whichTexture.loadText("moving hooks (horizontal)", color, font, renderer);
         } else if (whichAsset == 3){
-            whichTexture = draw.loadFromRenderedText("moving hooks (vertical)", color, font, whichW, whichH, renderer);
+            whichTexture.loadText("moving hooks (vertical)", color, font, renderer);
         } else if (whichAsset == 4){
-            whichTexture = draw.loadFromRenderedText("crates", color, font, whichW, whichH, renderer);
+            whichTexture.loadText("crates", color, font, renderer);
         }
     }
 }
 
-void developer::init(Draw draw, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer){
+void developer::init(SDL_Color color, TTF_Font* font, SDL_Renderer* renderer){
     clickstate = 0;
     x = 0;
     y = 0;
@@ -545,7 +535,7 @@ void developer::init(Draw draw, SDL_Color color, TTF_Font* font, SDL_Renderer* r
     h = 0;
     whichHook = -1;
     held = false;
-    moveSpeed = 5;
+    moveSpeed = 7;
     create = true;
     clicked1 = false;
     clicked2 = false;
@@ -556,10 +546,10 @@ void developer::init(Draw draw, SDL_Color color, TTF_Font* font, SDL_Renderer* r
     spawn = false;
     whichTile = 0;
     whichAsset = 0;
-    typeTexture = draw.loadFromRenderedText("drag", color, font, typeW, typeH, renderer);
-    createTexture = draw.loadFromRenderedText("create", color, font, createW, createH, renderer);
-    whichTexture = draw.loadFromRenderedText("test1", color, font, whichW, whichH, renderer);
-    moveSpeedTexture = draw.loadFromRenderedText("0", color, font, msW, msH, renderer);
+    typeTexture.loadText("drag", color, font, renderer);
+    createTexture.loadText("create", color, font, renderer);
+    whichTexture.loadText("test1", color, font, renderer);
+    moveSpeedTexture.loadText("0", color, font, renderer);
 }
 
 void developer::renderDRect(SDL_Renderer* renderer, std::string type, Event e, Level l, Object::Camera c){
@@ -568,11 +558,7 @@ void developer::renderDRect(SDL_Renderer* renderer, std::string type, Event e, L
         if(type == "drag"){
             SDL_RenderDrawRect(renderer, &heldRect);
         } else if (whichAsset == 1){
-            heldRect.w = TILE_WIDTH;
-            heldRect.h = TILE_HEIGHT;
-            heldRect.x = e.mouseX - TILE_WIDTH / 2;
-            heldRect.y = e.mouseY - TILE_HEIGHT / 2;
-            SDL_RenderCopy(renderer, l.Start_End, nullptr, &heldRect);
+            l.Start_End.render(renderer,  e.mouseX - TILE_WIDTH / 2, e.mouseY - TILE_HEIGHT / 2, 0, 0, TILE_WIDTH, TILE_HEIGHT);
         }
     }
     if ((whichAsset == 2 || whichAsset == 3) && whichHook != -1){
@@ -591,11 +577,7 @@ void developer::renderDRect(SDL_Renderer* renderer, std::string type, Event e, L
             heldRect.x = l.hookList[whichHook].limit2 - 4 - c.x;
             SDL_RenderDrawRect(renderer, &heldRect);
         }
-        heldRect.x = l.hookList[whichHook].x - (msW /2) - c.x;
-        heldRect.y = l.hookList[whichHook].y - (msH/2) - 40 - c.y;
-        heldRect.w = msW;
-        heldRect.h = msH;
-        SDL_RenderCopy(renderer, moveSpeedTexture, nullptr, &heldRect);
+        moveSpeedTexture.render(renderer, l.hookList[whichHook].x, l.hookList[whichHook].y - 40, c.x, c.y);
     }
 }
 
@@ -603,7 +585,7 @@ void developer::changeHookMoveSpeed(Event e, std::vector<Object::Point> &hooks, 
     if ((whichAsset == 2 || whichAsset == 3) && whichHook != -1){
         if(e.keyboard_state_array[SDL_SCANCODE_UP] && !clicked5){
             hooks[whichHook].moveSpeed++;
-            moveSpeedTexture = draw.loadFromRenderedText(std::to_string((int) hooks[whichHook].moveSpeed), color, font, msW, msH, renderer);
+            moveSpeedTexture.loadText(std::to_string((int) hooks[whichHook].moveSpeed), color, font, renderer);
             std::ofstream hFile(path + "hooks.txt", std::ofstream::out | std::ofstream::trunc);
             for(int i = 0; i < hooks.size(); i++){
                 std::string s = "";
@@ -630,7 +612,7 @@ void developer::changeHookMoveSpeed(Event e, std::vector<Object::Point> &hooks, 
         }
         if(e.keyboard_state_array[SDL_SCANCODE_DOWN] && !clicked6){
             hooks[whichHook].moveSpeed--;
-            moveSpeedTexture = draw.loadFromRenderedText(std::to_string((int) hooks[whichHook].moveSpeed), color, font, msW, msH, renderer);
+            moveSpeedTexture.loadText(std::to_string((int) hooks[whichHook].moveSpeed), color, font, renderer);
             std::ofstream hFile(path + "hooks.txt", std::ofstream::out | std::ofstream::trunc);
             for(int i = 0; i < hooks.size(); i++){
                 std::string s = "";

@@ -3,12 +3,13 @@
 
 class Crate : public physicsApplied {
 public:
-    Crate(float x, float y, float w, float h, SDL_Renderer* renderer, Draw draw, float mass);
+    Crate(float x, float y, float w, float h, SDL_Renderer* renderer, float mass);
     void collide(physicsApplied &a);
     void doFriction();
-    //the crate's coefficient of friction
-    float coeff;
+    void draw(Object::Camera c, SDL_Renderer* renderer);
+    
+private:
     //overlap of either the x or y for kinematic collisions
     float overlap;
-    SDL_Texture* texture;
+    Sprite texture;
 };

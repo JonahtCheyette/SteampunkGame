@@ -29,7 +29,7 @@ void Loader::loadLevels(std::vector<Level> &l, std::string path, SDL_Renderer* r
         while((de = readdir(dr)) != NULL){
             fName = de -> d_name;
             if(fName != "." && fName != ".." && fName != ".DS_Store"){
-                l.push_back(Level::levelInit(path + "/" + fName + "/", renderer, draw));
+                l.push_back(Level::levelInit(path + "/" + fName + "/", renderer));
             }
         }
     }

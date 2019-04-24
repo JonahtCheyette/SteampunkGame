@@ -37,31 +37,16 @@ Object:: Point:: Point(float x, float y, std::string type, float limit1, float l
 }
 
 void Object::drawPoint(Point a, Camera b, SDL_Renderer* renderer) {
-	SDL_Rect destination;
-	destination.x = a.x - 8 - b.x;
-	destination.y = a.y - 8 - b.y;
-	destination.w = 16;
-	destination.h = 16;
-
-	SDL_RenderCopy(renderer, hook, nullptr, &destination);
+    hook.render(renderer, a.x, a.y, b.x, b.y);
 }
 
 //FOR DRAWING HOOKS ONLY
 void Object::drawHooks(std::vector<Object:: Point> a, Camera b, int selected, SDL_Renderer* renderer) {
-    SDL_Rect destination;
     for(int i = 0; i < a.size(); i++){
         if(i == selected){
-            destination.x = a[i].x - 16 - b.x;
-            destination.y = a[i].y - 16 - b.y;
-            destination.w = 32;
-            destination.h = 32;
-            SDL_RenderCopy(renderer, single, nullptr, &destination);
+            single.render(renderer, a[i].x, a[i].y, b.x, b.y, 32, 32);
         }
-        destination.x = a[i].x - 8 - b.x;
-        destination.y = a[i].y - 8 - b.y;
-        destination.w = 16;
-        destination.h = 16;
-        SDL_RenderCopy(renderer, hook, nullptr, &destination);
+        hook.render(renderer, a[i].x, a[i].y, b.x, b.y);
     }
 }
 
@@ -95,37 +80,37 @@ Object::tileHolder::tileHolder(int kind, int tileNum, float friction, std::strin
     this -> clockWise = clockWise;
     this -> vertical = vertical;
     if(kind == 0){
-        topLeft = draw.loadTexture(path + "topLeft.png", renderer);
-        top = draw.loadTexture(path + "top.png", renderer);
-        topStickOut = draw.loadTexture(path + "topStickOut.png", renderer);
-        topRight = draw.loadTexture(path + "topRight.png", renderer);
-        right = draw.loadTexture(path + "right.png", renderer);
-        rightStickOut = draw.loadTexture(path + "rightStickOut.png", renderer);
-        bottomRight = draw.loadTexture(path + "bottomRight.png", renderer);
-        bottom = draw.loadTexture(path + "bottom.png", renderer);
-        bottomStickOut  = draw.loadTexture(path + "bottomStickOut.png", renderer);
-        bottomLeft = draw.loadTexture(path + "bottomLeft.png", renderer);
-        left = draw.loadTexture(path + "left.png", renderer);
-        leftStickOut  = draw.loadTexture(path + "leftStickOut.png", renderer);
-        center = draw.loadTexture(path + "center.png", renderer);
-        single = draw.loadTexture(path + "single.png", renderer);
-        wall = draw.loadTexture(path + "wall.png", renderer);
-        ceiling = draw.loadTexture(path + "ceiling.png", renderer);
+        topLeft.load(path + "topLeft.png", renderer);
+        top.load(path + "top.png", renderer);
+        topStickOut.load(path + "topStickOut.png", renderer);
+        topRight.load(path + "topRight.png", renderer);
+        right.load(path + "right.png", renderer);
+        rightStickOut.load(path + "rightStickOut.png", renderer);
+        bottomRight.load(path + "bottomRight.png", renderer);
+        bottom.load(path + "bottom.png", renderer);
+        bottomStickOut.load(path + "bottomStickOut.png", renderer);
+        bottomLeft.load(path + "bottomLeft.png", renderer);
+        left.load(path + "left.png", renderer);
+        leftStickOut.load(path + "leftStickOut.png", renderer);
+        center.load(path + "center.png", renderer);
+        single.load(path + "single.png", renderer);
+        wall.load(path + "wall.png", renderer);
+        ceiling.load(path + "ceiling.png", renderer);
     } else if(kind == 1){
-        passThrough = draw.loadTexture(path + "passThrough.png", renderer);
-        passThroughLeft = draw.loadTexture(path + "passThroughLeft.png", renderer);
-        passThroughRight = draw.loadTexture(path + "passThroughRight.png", renderer);
-        passThroughBoth = draw.loadTexture(path + "passThroughBoth.png", renderer);
+        passThrough.load(path + "passThrough.png", renderer);
+        passThroughLeft.load(path + "passThroughLeft.png", renderer);
+        passThroughRight.load(path + "passThroughRight.png", renderer);
+        passThroughBoth.load(path + "passThroughBoth.png", renderer);
     } else {
-        middle = draw.loadTexture(path + "middle.png", renderer);
-        end1 = draw.loadTexture(path + "end1.png", renderer);
-        end2 = draw.loadTexture(path + "end2.png", renderer);
+        middle.load(path + "middle.png", renderer);
+        end1.load(path + "end1.png", renderer);
+        end2.load(path + "end2.png", renderer);
     }
 }
 
 Object::Layer::Layer(float s, int w, int h, std::string path, SDL_Renderer* renderer){
     this -> scrollrate = s;
-    this -> image = draw.loadTexture(path, renderer);
+    this -> image.load(path, renderer);
     this -> w = w;
     this -> h = h;
 }
@@ -138,10 +123,10 @@ Object::Animation::Animation(std::string path, SDL_Renderer* renderer){
     aFile.close();
     frameGap = floor(60/fps);
     currentFrame = 0;
-    animation = draw.loadTextureWH(path + ".png", renderer, sW, sH);
+    animation.load(path + ".png", renderer);
     SDL_Rect clipper;
-    for(int i = 0; i < floor(sH/h); i++){
-        for(int j = 0; j < floor(sW/w); j++){
+    for(int i = 0; i < floor(animation.getHeight()/h); i++){
+        for(int j = 0; j < floor(animation.getWidth()/w); j++){
             clipper.x = j * w;
             clipper.y = i * h;
             clipper.w = w;
@@ -155,8 +140,8 @@ Object::Animation::Animation(std::string path, SDL_Renderer* renderer){
 }
 
 void Object:: textureInit(SDL_Renderer* renderer){
-    hook = draw.loadTexture("Steampunk-Game/Assets/Images/levelBasics/HookPlaceholder.png", renderer);
-    single = draw.loadTexture("Steampunk-Game/Assets/Images/tileTextures/girders/single.png", renderer);
+    hook.load("Steampunk-Game/Assets/Images/levelBasics/HookPlaceholder.png", renderer, 1);
+    single.load("Steampunk-Game/Assets/Images/tileTextures/girders/single.png", renderer, 1);
 }
 
 void Object:: moveCamera(Camera &a, int x, int y, int w, int h){
@@ -168,20 +153,15 @@ void Object:: moveCamera(Camera &a, int x, int y, int w, int h){
     if(a.y < 0) a.y = 0;
 }
 
-void Object::renderAnimation(Animation &a, SDL_Renderer* renderer, int x, int y, int w, int h){
+void Object::Animation::renderAnimation(Animation &a, SDL_Renderer* renderer, int x, int y, int w, int h){
     a.currentClip = &a.clip[a.currentFrame / a.frameGap];
     if(w == 0 || h == 0){
-        draw.render(a.animation, renderer, x, y, a.w, a.h, a.currentClip);
+        a.animation.render(renderer, x + (a.animation.getWidth() / 2), y + (a.animation.getHeight() / 2), 0, 0, a.animation.getWidth(), a.animation.getHeight(), a.currentClip);
     } else {
-        draw.render(a.animation, renderer, x, y, w, h, a.currentClip);
+        a.animation.render(renderer, x + (w/2), y + (h/2), 0, 0, w, h, a.currentClip);
     }
     a.currentFrame++;
     if(a.currentFrame / a.frameGap >= a.clip.size()){
         a.currentFrame = 0;
     }
-}
-
-Object::Animation Object::animationInit(std::string path, SDL_Renderer *renderer){
-    Animation a(path, renderer);
-    return a;
 }

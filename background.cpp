@@ -37,7 +37,7 @@ void backGround::drawBackground(SDL_Renderer* renderer, Object::Camera c, int h)
         }
         for(int j = 0 ; j <= yAmount; j++){
             for(int k = 0 ; k <= xAmount; k++){
-                SDL_RenderCopy(renderer, l[i].image, nullptr, &destination);
+                l[i].image.render(renderer, destination.x + destination.w / 2, destination.y + destination.h / 2, 0, 0, destination.w, destination.h);
                 destination.x += destination.w;
             }
             destination.x = start;
