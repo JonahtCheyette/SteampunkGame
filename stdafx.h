@@ -27,6 +27,7 @@
 #include "Sprite.h"
 #include "object.h"
 static Object object;
+#include "Vector.h"
 #include "background.h"
 #include "physicsApplied.h"
 #include "event.h"

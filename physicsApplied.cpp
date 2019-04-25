@@ -6,6 +6,16 @@ void physicsApplied::update(){
     //add acceleration to velocity
     velX += accelX;
     velY += accelY;
+    if(velX < -maxXSpeed){
+        velX = -maxXSpeed;
+    } else if (velX > maxXSpeed){
+        velX = maxXSpeed;
+    }
+    if(velY < -maxYSpeed){
+        velY = -maxYSpeed;
+    } else if (velY > maxYSpeed){
+        velY = maxYSpeed;
+    }
     //add velocity to position
     x += velX;
     y += velY;

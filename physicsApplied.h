@@ -3,6 +3,7 @@
 
 class physicsApplied {
 public:
+    //physicsApplied(float x, float y, int w,int h, maxXspeed, maxYspeed, velX, velY, coeff, mass);
     void update();
     void applyForce(float fx, float fy);
     void inelasticCollide(physicsApplied &a, bool xDir);
