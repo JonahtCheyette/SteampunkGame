@@ -1,28 +1,32 @@
 #include "stdafx.h"
 
+physicsApplied::physicsApplied(float x, float y, int w, int h, float maxSpeed, float velX, float velY, float coeff, float mass) : pos(x,y), initialPos(x,y), velocity(velX,velY), acceleration(0,0){
+    hitbox.x = x;
+    hitbox.y = y;
+    hitbox.width = w;
+    hitbox.height = h;
+    this -> maxSpeed = maxSpeed;
+    pushableUp = true;
+    pushableDown = true;
+    pushableLeft = true;
+    pushableRight = true;
+}
+
 void physicsApplied::update(){
     airborne = true;
-    velY += Gravity;
+    velocity.y += Gravity;
     //add acceleration to velocity
-    velX += accelX;
-    velY += accelY;
-    if(velX < -maxXSpeed){
-        velX = -maxXSpeed;
-    } else if (velX > maxXSpeed){
-        velX = maxXSpeed;
-    }
-    if(velY < -maxYSpeed){
-        velY = -maxYSpeed;
-    } else if (velY > maxYSpeed){
-        velY = maxYSpeed;
+    velocity.add(acceleration);
+    if(velocity.mag() > maxSpeed){
+        velocity.scaleTo(maxSpeed);
     }
     //add velocity to position
-    x += velX;
-    y += velY;
+    pos.add(velocity);
     //zero out Acceleration
-    accelX = 0;
-    accelY = 0;
-    if(abs(velX) < 0.001) velX = 0;
+    acceleration.mult(0);
+    if(abs(velocity.x) < 0.001) velocity.mult(0, 1);
+    hitbox.x = pos.x;
+    hitbox.y = pos.y;
     pushableUp = true;
     pushableDown = true;
     pushableLeft = true;
@@ -31,16 +35,20 @@ void physicsApplied::update(){
 
 void physicsApplied::applyForce(float fx, float fy){
     //takes changes velocity based on forces
-    accelX += (fx/mass);
-    accelY += (fy/mass);
+    acceleration.add(fx / mass, fy / mass);
+}
+
+void physicsApplied::applyForce(Vector force){
+    //takes changes velocity based on forces
+    acceleration.add(Vector::div(force, mass));
 }
 
 void physicsApplied::inelasticCollide(physicsApplied &a, bool xDir){
     if(xDir){
-        velX = ((mass * velX) + (a.mass * a.velX))/(mass + a.mass);
-        a.velX = velX;
+        velocity.x = ((mass * velocity.x) + (a.mass * a.velocity.x))/(mass + a.mass);
+        a.velocity.x = velocity.x;
     } else {
-        velY = ((mass * velY) + (a.mass * a.velY))/(mass + a.mass);
-        a.velY = velY;
+        velocity.y = ((mass * velocity.y) + (a.mass * a.velocity.y))/(mass + a.mass);
+        a.velocity.y = velocity.y;
     }
 }

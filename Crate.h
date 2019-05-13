@@ -3,7 +3,7 @@
 
 class Crate : public physicsApplied {
 public:
-    Crate(float x, float y, float w, float h, SDL_Renderer* renderer, float mass);
+    Crate(float x, float y, float w, float h, float velX, float velY, float maxSpeed, SDL_Renderer* renderer, float mass);
     void collide(physicsApplied &a);
     void doFriction();
     void draw(Object::Camera c, SDL_Renderer* renderer);

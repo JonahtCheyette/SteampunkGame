@@ -12,10 +12,10 @@ public:
     
     //what hook you have selected
     int selectedHook;
-    //where thegrapple is aiming
+    //where the grapple is aiming
     Object::Point target;
     //where the end of the grapple is
-    Object::Point grappleHead;
+    Vector grappleHead;
     //make sure that grappling is handled in the correct order
     int hookState;
     
@@ -25,9 +25,8 @@ private:
     //distance variables for applying extra force when your farther away than when you were last frame
     float distance;
     float pDistance;
-    //general variables for grappling (i use them for multiple different things)
-    float gX;
-    float gY;
+    //variable for general use in grappling
+    Vector generalGrapple;
     //how fast the grapple moves
     float grappleSpeed;
     //store what hook you have selected in case you switch mid grapple

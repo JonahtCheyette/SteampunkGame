@@ -381,11 +381,11 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
         if(e.mouse1){
             if(create){
                 //makes a new hook, puts it into the vector
-                l.crateList.push_back({(float) (e.mouseX + c.x),(float) (e.mouseY + c.y),70,70, renderer, 2});
+                l.crateList.push_back({(float) (e.mouseX + c.x),(float) (e.mouseY + c.y),70,70, 0, 0, 10, renderer, 2});
             } else {
                 //deletes all hooks within 30 px of mouseclick
                 for(int i = (int) (l.crateList.size()) - 1; i >= 0; i--){
-                    if(sqrt(pow(l.crateList[i].x - (e.mouseX + c.x),2) + pow(l.crateList[i].y - (e.mouseY + c.y),2)) <= 30){
+                    if(sqrt(pow(l.crateList[i].pos.x - (e.mouseX + c.x),2) + pow(l.crateList[i].pos.y - (e.mouseY + c.y),2)) <= 30){
                         l.crateList.erase(l.crateList.begin() + i);
                     }
                 }
@@ -394,9 +394,9 @@ void developer::editAssets(Object::Camera c,Event e, Level &l, SDL_Renderer* ren
             std::ofstream cFile(l.path + "Crates.txt", std::ofstream::out | std::ofstream::trunc);
             for(int i = 0; i < l.crateList.size(); i++){
                 std::string s = "";
-                s += std::to_string((int) l.crateList[i].initX);
+                s += std::to_string((int) l.crateList[i].initialPos.x);
                 s += " ";
-                s += std::to_string((int) l.crateList[i].initY);
+                s += std::to_string((int) l.crateList[i].initialPos.y);
                 s += " ";
                 s += std::to_string((int) l.crateList[i].hitbox.width);
                 s += " ";
@@ -646,9 +646,9 @@ void developer::reset(Level &l){
         l.hookList[i].y = l.hookList[i].initY;
     }
     for(int i = 0; i < l.crateList.size(); i++){
-        l.crateList[i].x = l.crateList[i].initX;
-        l.crateList[i].y = l.crateList[i].initY;
-        l.crateList[i].velX = 0;
-        l.crateList[i].velY = 0;
+        l.crateList[i].pos.x = l.crateList[i].initialPos.x;
+        l.crateList[i].pos.y = l.crateList[i].initialPos.y;
+        l.crateList[i].velocity.x = 0;
+        l.crateList[i].velocity.y = 0;
     }
 }

@@ -27,8 +27,7 @@ int main(int argc, char * args[]) {
     bool dMode = false;
     bool dSwitch = false;
     Dper.init(black, Sans, renderer);
-    player.x = levels[whichLevel].spawn.x;
-    player.y = levels[whichLevel].spawn.y;
+    player.pos.set(levels[whichLevel].spawn.x, levels[whichLevel].spawn.y);
     
     std::string type = "drag";
     
@@ -83,7 +82,7 @@ int main(int argc, char * args[]) {
                 
                 levels[whichLevel].update(player, camera, tiles);
                 
-                object.moveCamera(camera, player.x, player.y, levels[whichLevel].width, levels[whichLevel].height);
+                object.moveCamera(camera, player.pos.x, player.pos.y, levels[whichLevel].width, levels[whichLevel].height);
             } else {
                 Dper.moveCamera(camera, event);
                 if(type == "drag"){
@@ -114,8 +113,8 @@ int main(int argc, char * args[]) {
                 Dper.renderDRect(renderer, type, event, levels[whichLevel], camera);
             }
             
-            if(player.hookState == 2) SDL_RenderDrawLine(renderer, player.x - camera.x, player.y - camera.y, player.target.x - camera.x, player.target.y - camera.y);
-            if(player.hookState == 1 || player.hookState == 3) SDL_RenderDrawLine(renderer, player.x - camera.x, player.y - camera.y, player.grappleHead.x - camera.x, player.grappleHead.y - camera.y);
+            if(player.hookState == 2) SDL_RenderDrawLine(renderer, player.pos.x - camera.x, player.pos.y - camera.y, player.target.x - camera.x, player.target.y - camera.y);
+            if(player.hookState == 1 || player.hookState == 3) SDL_RenderDrawLine(renderer, player.pos.x - camera.x, player.pos.y - camera.y, player.grappleHead.x - camera.x, player.grappleHead.y - camera.y);
             if(!menu.pauseMenuOpen){
                 SDL_RenderPresent(renderer);
             }

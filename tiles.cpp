@@ -177,16 +177,16 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
             tEdge = tileGrid[i].y + (tileGrid[i].h / 2);
             bEdge = tileGrid[i].y + tileGrid[i].h;
         }
-        if (a.x + a.hitbox.width / 2 > lEdge && a.x - a.hitbox.width / 2 < rEdge && a.y + a.hitbox.height / 2 > tEdge && a.y - a.hitbox.height / 2 < bEdge) {
-            if(a.x + a.hitbox.width / 2 <= rEdge){
-                xOverlap = (a.x + a.hitbox.width / 2) - lEdge;
+        if (a.pos.x + a.hitbox.width / 2 > lEdge && a.pos.x - a.hitbox.width / 2 < rEdge && a.pos.y + a.hitbox.height / 2 > tEdge && a.pos.y - a.hitbox.height / 2 < bEdge) {
+            if(a.pos.x + a.hitbox.width / 2 <= rEdge){
+                xOverlap = (a.pos.x + a.hitbox.width / 2) - lEdge;
             } else {
-                xOverlap = (a.x - a.hitbox.width / 2) - rEdge;
+                xOverlap = (a.pos.x - a.hitbox.width / 2) - rEdge;
             }
-            if(a.y + a.hitbox.height / 2 <= bEdge){
-                yOverlap = (a.y + a.hitbox.height/2) - tEdge;
+            if(a.pos.y + a.hitbox.height / 2 <= bEdge){
+                yOverlap = (a.pos.y + a.hitbox.height/2) - tEdge;
             } else {
-                yOverlap = (a.y - a.hitbox.height / 2) - bEdge;
+                yOverlap = (a.pos.y - a.hitbox.height / 2) - bEdge;
             }
             if(abs(yOverlap) > TILE_HEIGHT){
                 yOverlap = TILE_HEIGHT;
@@ -226,14 +226,14 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                 tEdge = tileGrid[intercepts[i]].y + (tileGrid[intercepts[i]].h / 2);
                 bEdge = tileGrid[intercepts[i]].y + tileGrid[intercepts[i]].h;
             }
-            if (a.x + a.hitbox.width / 2 > lEdge && a.x - a.hitbox.width / 2 < rEdge && a.y +  a.hitbox.height / 2 > tEdge && a.y - a.hitbox.height / 2 < bEdge) {
+            if (a.pos.x + a.hitbox.width / 2 > lEdge && a.pos.x - a.hitbox.width / 2 < rEdge && a.pos.y +  a.hitbox.height / 2 > tEdge && a.pos.y - a.hitbox.height / 2 < bEdge) {
                 if(tileGrid[intercepts[i]].kind == 0 || tileGrid[intercepts[i]].kind == 2){
                     a.friction = tileGrid[intercepts[i]].f;
-                    if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY + 0.01)) {
-                        a.y = tEdge - a.hitbox.height / 2;
+                    if ((a.pos.y + a.hitbox.height / 2) <= (tEdge + a.velocity.y + 0.01)) {
+                        a.pos.y = tEdge - a.hitbox.height / 2;
                         a.pushableDown = false;
-                        if(a.velY >= 0){
-                            a.velY = 0;
+                        if(a.velocity.y >= 0){
+                            a.velocity.y = 0;
                             a.airborne = false;
                             if(tileGrid[intercepts[i]].kind == 2){
                                 if(!tileGrid[intercepts[i]].vertical){
@@ -245,9 +245,9 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                                 }
                             }
                         }
-                    } else if ((a.y - a.hitbox.height / 2) >= (bEdge + a.velY - 0.01)){
-                        a.y = bEdge + a.hitbox.height / 2;
-                        a.velY = 0;
+                    } else if ((a.pos.y - a.hitbox.height / 2) >= (bEdge + a.velocity.y - 0.01)){
+                        a.pos.y = bEdge + a.hitbox.height / 2;
+                        a.velocity.y = 0;
                         a.pushableUp = false;
                         if(tileGrid[intercepts[i]].kind == 2){
                             if(!tileGrid[intercepts[i]].vertical){
@@ -258,9 +258,9 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                                 }
                             }
                         }
-                    } else if ((a.x - a.hitbox.width / 2) >= (rEdge + a.velX - 0.01)){
-                        a.x = rEdge + a.hitbox.width / 2;
-                        a.velX = 0;
+                    } else if ((a.pos.x - a.hitbox.width / 2) >= (rEdge + a.velocity.x - 0.01)){
+                        a.pos.x = rEdge + a.hitbox.width / 2;
+                        a.velocity.x = 0;
                         a.pushableLeft = false;
                         if(tileGrid[intercepts[i]].kind == 2){
                             if(tileGrid[intercepts[i]].vertical){
@@ -273,8 +273,8 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                         }
                     } else {
                         a.pushableRight = false;
-                        a.x = lEdge - a.hitbox.width / 2;
-                        a.velX = 0;
+                        a.pos.x = lEdge - a.hitbox.width / 2;
+                        a.velocity.x = 0;
                         if(tileGrid[intercepts[i]].kind == 2){
                             if(tileGrid[intercepts[i]].vertical){
                                 if(tileGrid[intercepts[i]].clockWise){
@@ -286,12 +286,12 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
                         }
                     }
                 } else {
-                    if ((a.y + a.hitbox.height / 2) <= (tEdge + a.velY + 0.01)) {
+                    if ((a.pos.y + a.hitbox.height / 2) <= (tEdge + a.velocity.y + 0.01)) {
                         a.pushableDown = false;
                         a.friction = tileGrid[intercepts[i]].f;
-                        a.y = tEdge - a.hitbox.height / 2;
-                        if(a.velY >= 0){
-                            a.velY = 0;
+                        a.pos.y = tEdge - a.hitbox.height / 2;
+                        if(a.velocity.y >= 0){
+                            a.velocity.y = 0;
                             a.airborne = false;
                         }
                     }

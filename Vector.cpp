@@ -5,6 +5,21 @@ Vector::Vector(float x, float y){
     this -> y = y;
 }
 
+void Vector::set(float nX, float nY){
+    x = nX;
+    y = nY;
+}
+/*
+ have:
+ c, x, y, theta, Ntheta
+ don't have:
+ 
+ solving for:
+ x', y'
+ 
+ 
+ 
+ */
 void Vector::add(Vector b){
     x += b.x;
     y += b.y;
@@ -17,6 +32,14 @@ void Vector::add(float x, float y){
 
 Vector Vector::add(Vector a, Vector b){
     return Vector(a.x + b.x, a.y + b.y);
+}
+
+Vector Vector::add(Vector a, float x, float y){
+    return Vector(a.x + x, a.y + y);
+}
+
+Vector Vector::add(float x, float y, Vector a){
+    return Vector(x + a.x, y + a.y);
 }
 
 Vector Vector::add(float x, float y, float X, float Y){
@@ -35,6 +58,14 @@ void Vector::sub(float x, float y){
 
 Vector Vector::sub(Vector a, Vector b){
     return Vector(a.x - b.x, a.y - b.y);
+}
+
+Vector Vector::sub(Vector a, float x, float y){
+    return Vector(a.x - x, a.y - y);
+}
+
+Vector Vector::sub(float x, float y, Vector a){
+    return Vector(x - a.x, y - a.y);
 }
 
 Vector Vector::sub(float x, float y, float X, float Y){
@@ -111,6 +142,33 @@ void Vector::normalize(){
 void Vector::scaleTo(float size){
     normalize();
     mult(size);
+}
+
+void Vector:: orient(float angle){
+    tempMag = mag();
+    tempAngle = dir() + angle;
+    x = tempMag * cos(tempAngle);
+    y = tempMag * sin(tempAngle);
+}
+
+void Vector:: orientRad(float angle){
+    tempMag = mag();
+    tempAngle = dir() + (angle * 180 / M_PI);
+    x = tempMag * cos(tempAngle);
+    y = tempMag * sin(tempAngle);
+}
+
+void Vector:: setDir(float angle){
+    tempMag = mag();
+    x = tempMag * cos(angle);
+    y = tempMag * sin(angle);
+}
+
+void Vector:: setDirRad(float angle){
+    tempMag = mag();
+    tempAngle = (angle * 180 / M_PI);
+    x = tempMag * cos(tempAngle);
+    y = tempMag * sin(tempAngle);
 }
 
 float Vector::mag(){

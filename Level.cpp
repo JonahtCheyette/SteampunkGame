@@ -38,7 +38,7 @@ Level Level::levelInit(std::string path, SDL_Renderer* renderer){
         }
     }
     while(cFile >> a >> b >> c >> d >> e){
-        level.crateList.push_back({a, b, c, d, renderer, e});
+        level.crateList.push_back({a, b, c, d, 0, 0, 10, renderer, e});
     }
     level.height = (int) level.tileGrid.size() * TILE_HEIGHT;
     level.width = (int) level.tileGrid[0].size() * TILE_WIDTH;
@@ -89,7 +89,7 @@ void Level::update(physicsApplied &a, Object::Camera c, Tiles tiles){
         }
     }
     for(int i = 0; i < crateList.size(); i++){
-        if (crateList[i].y + crateList[i].hitbox.height / 2 > c.y - physUpdateRange && crateList[i].y - crateList[i].hitbox.height / 2 < c.y + SCREEN_HEIGHT + physUpdateRange && crateList[i].x + crateList[i].hitbox.width / 2 > c.x - physUpdateRange && crateList[i].x - crateList[i].hitbox.width / 2 < c.x + SCREEN_WIDTH + physUpdateRange){
+        if (crateList[i].pos.y + crateList[i].hitbox.height / 2 > c.y - physUpdateRange && crateList[i].pos.y - crateList[i].hitbox.height / 2 < c.y + SCREEN_HEIGHT + physUpdateRange && crateList[i].pos.x + crateList[i].hitbox.width / 2 > c.x - physUpdateRange && crateList[i].pos.x - crateList[i].hitbox.width / 2 < c.x + SCREEN_WIDTH + physUpdateRange){
             crateList[i].update();
             tiles.checkCollision(tiles.loadedLevel, crateList[i]);
             crateList[i].collide(a);
@@ -100,7 +100,7 @@ void Level::update(physicsApplied &a, Object::Camera c, Tiles tiles){
 
 void Level::draw(SDL_Renderer* renderer, Object::Camera c){
     for(int i = 0; i < crateList.size(); i++){
-        if (crateList[i].y + crateList[i].hitbox.height / 2 > c.y && crateList[i].y - crateList[i].hitbox.height / 2 < c.y + SCREEN_HEIGHT && crateList[i].x + crateList[i].hitbox.width / 2 > c.x && crateList[i].x - crateList[i].hitbox.width / 2 < c.x + SCREEN_WIDTH){
+        if (crateList[i].pos.y + crateList[i].hitbox.height / 2 > c.y && crateList[i].pos.y - crateList[i].hitbox.height / 2 < c.y + SCREEN_HEIGHT && crateList[i].pos.x + crateList[i].hitbox.width / 2 > c.x && crateList[i].pos.x - crateList[i].hitbox.width / 2 < c.x + SCREEN_WIDTH){
             crateList[i].draw(c, renderer);
         }
     }
