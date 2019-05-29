@@ -5,7 +5,7 @@ class Level {
 public:
     static Level levelInit(std::string path, SDL_Renderer* renderer);
     void renderEnd(Object::Camera c, SDL_Renderer* renderer);
-    void update(physicsApplied &a, Object::Camera c, Tiles tiles);
+    void update(physicsApplied &a, Object::Camera c);
     void draw(SDL_Renderer* renderer, Object::Camera c);
     
     int overlap;

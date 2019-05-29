@@ -1,15 +1,14 @@
 #include "stdafx.h"
 
-Object::Camera::Camera() {
-	x = 0;
-	y = 0;
-	camera = { x, y, SCREEN_WIDTH, SCREEN_HEIGHT };
+Object::Camera::Camera(){
+    x = 0;
+    y = 0;
+	camera = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
 }
 
 Object::Point::Point() {
 	x = SCREEN_WIDTH / 2;
 	y = SCREEN_HEIGHT / 2;
-    type = "N/A";
 }
 
 Object:: Point:: Point(float x, float y, std::string type){
@@ -144,13 +143,13 @@ void Object:: textureInit(SDL_Renderer* renderer){
     single.load("Steampunk-Game/Assets/Images/tileTextures/girders/single.png", renderer, 1);
 }
 
-void Object:: moveCamera(Camera &a, int x, int y, int w, int h){
-    a.x = (x) - SCREEN_WIDTH / 2;
-    a.y = (y) - SCREEN_HEIGHT / 2;
-    if(a.x + SCREEN_WIDTH > w) a.x = w - SCREEN_WIDTH;
-    if (a.x < 0) a.x = 0;
-    if(a.y + SCREEN_HEIGHT > h) a.y = h - SCREEN_HEIGHT;
-    if(a.y < 0) a.y = 0;
+void Object::Camera:: move(int x, int y, int w, int h){
+    this -> x = (x) - SCREEN_WIDTH / 2;
+    this -> y = (y) - SCREEN_HEIGHT / 2;
+    if(x + SCREEN_WIDTH > w) x = w - SCREEN_WIDTH;
+    if (x < 0) x = 0;
+    if(y + SCREEN_HEIGHT > h) y = h - SCREEN_HEIGHT;
+    if(y < 0) y = 0;
 }
 
 void Object::Animation::renderAnimation(Animation &a, SDL_Renderer* renderer, int x, int y, int w, int h){

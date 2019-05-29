@@ -25,9 +25,9 @@
 #include <fstream>
 
 #include "Sprite.h"
+#include "Vector.h"
 #include "object.h"
 static Object object;
-#include "Vector.h"
 #include "background.h"
 #include "physicsApplied.h"
 #include "event.h"
@@ -36,7 +36,6 @@ static Event event;
 static Menu menu;
 #include "Crate.h"
 #include "tiles.h"
-static Tiles tiles;
 #include "Level.h"
 #include "Player.h"
 #include "loader.h"

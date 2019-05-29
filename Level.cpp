@@ -72,7 +72,7 @@ void Level::renderEnd(Object::Camera c, SDL_Renderer* renderer){
     }
 }
 
-void Level::update(physicsApplied &a, Object::Camera c, Tiles tiles){
+void Level::update(physicsApplied &a, Object::Camera c){
     for(int i = 0; i < hookList.size(); i++){
         if (hookList[i].y > c.y - 50 && hookList[i].y < c.y + SCREEN_HEIGHT + 50 && hookList[i].x > c.x - 50 && hookList[i].x < c.x + SCREEN_WIDTH + 50){
             if(hookList[i].vertical){
@@ -91,7 +91,7 @@ void Level::update(physicsApplied &a, Object::Camera c, Tiles tiles){
     for(int i = 0; i < crateList.size(); i++){
         if (crateList[i].pos.y + crateList[i].hitbox.height / 2 > c.y - physUpdateRange && crateList[i].pos.y - crateList[i].hitbox.height / 2 < c.y + SCREEN_HEIGHT + physUpdateRange && crateList[i].pos.x + crateList[i].hitbox.width / 2 > c.x - physUpdateRange && crateList[i].pos.x - crateList[i].hitbox.width / 2 < c.x + SCREEN_WIDTH + physUpdateRange){
             crateList[i].update();
-            tiles.checkCollision(tiles.loadedLevel, crateList[i]);
+            Tiles::checkCollision(Tiles::getLoadedLevel(), crateList[i]);
             crateList[i].collide(a);
             crateList[i].doFriction();
         }

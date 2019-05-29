@@ -302,7 +302,7 @@ void Tiles::checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a
 }
 
 //for the grapple collisions
-Object::Point Tiles::checkLineCollision(std::vector<Object::Tile> tileGrid, Object:: Point a, Object:: Point b) {
+Vector Tiles::checkLineCollision(std::vector<Object::Tile> tileGrid, Vector a, Object:: Point b) {
     //slope and intercept
     m = (a.y - b.y)/(a.x - b.x);
     intercept = a.y - (m * a.x);
@@ -397,5 +397,17 @@ Object::Point Tiles::checkLineCollision(std::vector<Object::Tile> tileGrid, Obje
         return lineCollision;
     }
     lineCollided = false;
-    return b;
+    return Vector(b.x, b.y);
+}
+
+std::vector<Object::Tile> Tiles::getLoadedLevel(){
+    return loadedLevel;
+}
+
+void Tiles::spliceFromLoadedLevel(int index){
+    loadedLevel.erase(loadedLevel.begin() + index);
+}
+
+void Tiles::addToLoadedLevel(Object::Tile t){
+    loadedLevel.push_back(t);
 }

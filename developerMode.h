@@ -5,7 +5,7 @@ class developer {
 public:
     void moveCamera(Object::Camera &camera, Event event);
     void showEditing(std::string type, SDL_Color color, TTF_Font* font, std::vector<Object::tileHolder> tileVector, SDL_Renderer* renderer);
-    void editLevel(Object::Camera camera, std::vector<Object::tileHolder> tileVector, Level level, SDL_Renderer* renderer, Event event, std::vector<Object::Tile> &tileGrid);
+    void editLevel(Object::Camera camera, std::vector<Object::tileHolder> tileVector, Level level, SDL_Renderer* renderer, Event event, std::vector<Object::Tile> tileGrid);
     void editAssets(Object::Camera c, Event e, Level &l, SDL_Renderer* renderer, SDL_Color color, TTF_Font* font);
     void createSwitch(Event e, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer);
     void typeSwitch(Event e, std::string &type, SDL_Color color, TTF_Font* font, SDL_Renderer* renderer);

@@ -9,7 +9,7 @@ void developer::moveCamera(Object::Camera &camera, Event event){
     if(camera.y < 0) camera.y = 0;
 }
 
-void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder> tileVector, Level level, SDL_Renderer *renderer, Event event, std::vector<Object::Tile> &tileGrid){
+void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder> tileVector, Level level, SDL_Renderer *renderer, Event event, std::vector<Object::Tile> tileGrid){
     //initializing the rectangle
     if(event.mouse1 && clickstate == 0){
         x = event.mouseX + camera.x;
@@ -68,7 +68,7 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
                     }
                     for(int k = 0; k < tileGrid.size(); k++){
                         if(tileGrid[k].x == tx && tileGrid[k].y == ty){
-                            tileGrid.erase(tileGrid.begin() + k);
+                            Tiles::spliceFromLoadedLevel(k);
                         }
                     }
                     if(create){
@@ -82,7 +82,7 @@ void developer::editLevel(Object::Camera camera, std::vector<Object::tileHolder>
                             t.clockWise = tileVector[whichTile].clockWise;
                             t.vertical = tileVector[whichTile].vertical;
                         }
-                        tileGrid.push_back(t);
+                        Tiles::addToLoadedLevel(t);
                     }
                 }
             }

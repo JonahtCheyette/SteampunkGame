@@ -13,7 +13,7 @@ public:
     //what hook you have selected
     int selectedHook;
     //where the grapple is aiming
-    Object::Point target;
+    Vector target;
     //where the end of the grapple is
     Vector grappleHead;
     //make sure that grappling is handled in the correct order
@@ -40,6 +40,8 @@ private:
     bool changedHook;
     //makes it so button presses activate Once
     bool clicked;
+    //checks to see if the target is a hook or not
+    bool isTargetHook;
     
     float grapplerange = 700;
     

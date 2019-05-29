@@ -10,9 +10,10 @@ public:
     Sprite single;
     //camera object
     struct Camera {
-        int x, y;
+        float x, y;
         SDL_Rect camera;
         Camera();
+        void move(int x, int y, int w, int h);
     };
 
     struct Point {
@@ -131,6 +132,4 @@ public:
         //the spritesheet to animate off of
         Sprite animation;
     };
-    
-    void moveCamera(Camera &a, int x, int y, int w, int h);
 };

@@ -32,8 +32,8 @@ int main(int argc, char * args[]) {
     std::string type = "drag";
     
 	Object::Camera camera;
-    
-	tiles.mapInit(levels[whichLevel].tileGrid, tileVector);
+
+    Tiles::mapInit(levels[whichLevel].tileGrid, tileVector);
     
     object.textureInit(renderer);
 	menu.menuInit(renderer);
@@ -74,19 +74,19 @@ int main(int argc, char * args[]) {
 				SDL_RenderPresent(renderer);
 			}
             if(!dMode){
-                player.move(e, levels[whichLevel], camera, tiles.loadedLevel, whichLevel, (int) (levels.size()));
+                player.move(e, levels[whichLevel], camera, Tiles::getLoadedLevel(), whichLevel, (int) (levels.size()));
                 
                 player.moveHook(levels[whichLevel].hookList);
                 
-                tiles.checkCollision(tiles.loadedLevel, player);
+                Tiles::checkCollision(Tiles::getLoadedLevel(), player);
                 
-                levels[whichLevel].update(player, camera, tiles);
+                levels[whichLevel].update(player, camera);
                 
-                object.moveCamera(camera, player.pos.x, player.pos.y, levels[whichLevel].width, levels[whichLevel].height);
+                camera.move(player.pos.x, player.pos.y, levels[whichLevel].width, levels[whichLevel].height);
             } else {
                 Dper.moveCamera(camera, event);
                 if(type == "drag"){
-                    Dper.editLevel(camera, tileVector, levels[whichLevel], renderer, event, tiles.loadedLevel);
+                    Dper.editLevel(camera, tileVector, levels[whichLevel], renderer, event, Tiles::getLoadedLevel());
                 } else {
                     Dper.editAssets(camera, event, levels[whichLevel], renderer, black, Sans);
                 }
@@ -104,7 +104,7 @@ int main(int argc, char * args[]) {
                 player.draw(camera, renderer);
             }
             
-            tiles.drawTiles(tiles.loadedLevel, camera, renderer, tileVector);
+            Tiles::drawTiles(Tiles::getLoadedLevel(), camera, renderer, tileVector);
             
             levels[whichLevel].renderEnd(camera, renderer);
             
