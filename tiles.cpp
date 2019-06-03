@@ -1,5 +1,32 @@
 #include "stdafx.h"
 
+std::vector<Object::Tile> Tiles::loadedLevel;
+int Tiles::intercepts[9];
+float Tiles::overallOverlap[9];
+float Tiles::colOverlap;
+float Tiles::xOverlap;
+float Tiles::yOverlap;
+int Tiles::correctIndex;
+
+bool Tiles::lineCollided;
+float Tiles::distance;
+float Tiles::m;
+float Tiles::intercept;
+int Tiles::lEdge;
+int Tiles::rEdge;
+int Tiles::tEdge;
+int Tiles::bEdge;
+int Tiles::lEdgeLine;
+int Tiles::rEdgeLine;
+int Tiles::tEdgeLine;
+int Tiles::bEdgeLine;
+Vector Tiles::lineCollision(0,0);
+
+bool Tiles::above;
+bool Tiles::below;
+bool Tiles::toTheRight;
+bool Tiles::toTheLeft;
+
 void Tiles::mapInit(std::vector< std::vector <int> > tileGrid, std::vector<Object::tileHolder> t) {
     for(int i = 0; i < t.size(); i++){
         if(t[i].tileNum != 0){
