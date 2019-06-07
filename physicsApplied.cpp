@@ -10,6 +10,7 @@ physicsApplied::physicsApplied(float x, float y, int w, int h, float maxSpeed, f
     pushableDown = true;
     pushableLeft = true;
     pushableRight = true;
+    this -> mass = mass;
 }
 
 void physicsApplied::update(){
@@ -17,14 +18,18 @@ void physicsApplied::update(){
     velocity.y += Gravity;
     //add acceleration to velocity
     velocity.add(acceleration);
-    if(velocity.mag() > maxSpeed){
-        velocity.scaleTo(maxSpeed);
+    if(abs(velocity.x) > maxSpeed){
+        if(velocity.x > 0){
+            velocity.x = maxSpeed;
+        } else {
+            velocity.x = -maxSpeed;
+        }
     }
     //add velocity to position
     pos.add(velocity);
     //zero out Acceleration
     acceleration.mult(0);
-    if(abs(velocity.x) < 0.001) velocity.mult(0, 1);
+    if(abs(velocity.x) < 0.1) velocity.mult(0, 1);
     hitbox.x = pos.x;
     hitbox.y = pos.y;
     pushableUp = true;

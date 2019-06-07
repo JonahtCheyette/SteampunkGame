@@ -146,10 +146,10 @@ void Object:: textureInit(SDL_Renderer* renderer){
 void Object::Camera:: move(int x, int y, int w, int h){
     this -> x = (x) - SCREEN_WIDTH / 2;
     this -> y = (y) - SCREEN_HEIGHT / 2;
-    if(x + SCREEN_WIDTH > w) x = w - SCREEN_WIDTH;
-    if (x < 0) x = 0;
-    if(y + SCREEN_HEIGHT > h) y = h - SCREEN_HEIGHT;
-    if(y < 0) y = 0;
+    if(this -> x + SCREEN_WIDTH > w) this -> x = w - SCREEN_WIDTH;
+    if (this -> x < 0) this -> x = 0;
+    if(this -> y + SCREEN_HEIGHT > h) this -> y = h - SCREEN_HEIGHT;
+    if(this -> y < 0) this -> y = 0;
 }
 
 void Object::Animation::renderAnimation(Animation &a, SDL_Renderer* renderer, int x, int y, int w, int h){

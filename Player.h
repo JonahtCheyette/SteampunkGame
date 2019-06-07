@@ -21,7 +21,7 @@ public:
     
 private:
     //force to be applied in when moving the character using A and D
-    float acceleration;
+    float moveForce;
     //distance variables for applying extra force when your farther away than when you were last frame
     float distance;
     float pDistance;

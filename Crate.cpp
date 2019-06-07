@@ -84,7 +84,7 @@ void Crate::collide(physicsApplied &a){
 
 void Crate::doFriction(){
     if(!airborne){
-        applyForce(-1 * friction * mass * Gravity, 0);
+        applyForce(-velocity.x * friction * mass * Gravity, 0);
     }
 }
 

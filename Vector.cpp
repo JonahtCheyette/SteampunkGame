@@ -135,8 +135,9 @@ Vector Vector::div(float x, float y, float factor){
 }
 
 void Vector::normalize(){
-    x /= mag();
-    x /= mag();
+    tempMag = mag();
+    x /= tempMag;
+    y /= tempMag;
 }
 
 void Vector::scaleTo(float size){
