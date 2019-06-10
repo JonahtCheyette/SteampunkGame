@@ -8,6 +8,7 @@ public:
     static void checkCollision(std::vector<Object::Tile> tileGrid, physicsApplied &a);
     static Vector checkLineCollision(std::vector<Object::Tile> tileGrid, Vector a, Object:: Point b);
     static std::vector<Object::Tile> getLoadedLevel();
+    static bool getLineCollided();
     //for developermode because returning a raference gave me more errors
     static void spliceFromLoadedLevel(int index);
     static void addToLoadedLevel(Object::Tile t);

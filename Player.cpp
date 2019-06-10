@@ -153,7 +153,7 @@ void Player::grapple(Object:: Point b, std::vector<Object::Tile> tileGrid, Objec
             selectedHookHolder = selectedHook;
             generalGrapple = Vector::sub(grappleHead, target);
             distance = generalGrapple.mag();
-            isTargetHook = true;
+            isTargetHook = !Tiles::getLineCollided();
             if(distance > grapplerange){
                 generalGrapple.scaleTo(grapplerange);
                 target.x = pos.x - generalGrapple.x;
